@@ -6,6 +6,7 @@
 
 int no_of_consumers;
 int no_of_chairs;
+int last_ticket_no;
 int no_of_chairs_occupied;
 int ticket_number;
 
@@ -44,6 +45,7 @@ int main(int argc, char ** argv)
 	// ask for number of chairs
 	printf("Enter the number of seats at the Barber's shop (int): \n");
 	scanf("%d", &no_of_chairs);
+	last_ticket_no = no_of_chairs;
 	
 	tickets = (_Bool *) calloc(no_of_chairs, sizeof(_Bool));
 	
@@ -90,6 +92,13 @@ int main(int argc, char ** argv)
 	rc = pthread_create(&threads[0], NULL, barber_routine, (void *) &barbers_pace); //barber routine takes barber_pace as the arg
 	if (rc) {
 		printf("ERROR; return code from pthread_create() (barber) is %d\n", rc);
+		exit(-1);
+	}
+
+	//create the assistant thread.
+	rc = pthread_create(&threads[0], NULL, assistant_routine, (void *) NULL);
+	if (rc) {
+		printf("ERROR; return code from pthread_create() (assistant) is %d\n", rc);
 		exit(-1);
 	}
 
@@ -166,28 +175,30 @@ void * consumer_routine(void * arg) {
 	printf("Customer [%d]: I have arrived at the barber shop.", *consumer_number);
 	
 	pthread_mutex_trylock(&barber_mutex);
-    if (no_of_chairs_occupied == no_of_chairs) {
+    	if (no_of_chairs_occupied == no_of_chairs) {
 		printf("Customer [%d]: oh no! all seats have been taken and I'll leave now!\n", consumer_number);
 
 	} else { 
 		
-		int i = 0;
-		while(i < no_of_chairs && ticket_number == -1) {
-			if(tickets[i] == 0) {
-				ticket_number = i;
-				tickets[i] = 1
+		// int i = 0;
+		// while(i < no_of_chairs && ticket_number == -1) {
+		// 	if(tickets[i] == 0) {
+		// 		ticket_number = i;
+		// 		tickets[i] = 1
 
-			}
+		// 	}
 
-			i++
-		}
+		// 	i++
+		// }
+		
+		last_ticket_no = last_ticket_no > no_of_chairs ? 1 : last_ticket_no + 1;
 	
-        printf("Customer [%d]: I'm lucky to get a free seat and a ticket numbered %d\n", consumer_number);
+		printf("Customer [%d]: I'm lucky to get a free seat and a ticket numbered %d\n", consumer_number, last_ticket_no);
 
-        if(no_of_chairs_occupied == 0) {
-            pthread_cond_signal(&empty_chairs_cond);
+		if(no_of_chairs_occupied == 0) {
+		    pthread_cond_signal(&empty_chairs_cond);
 
-        }
+		}
 
 		no_of_chairs_occupied++;
 
