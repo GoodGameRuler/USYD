@@ -204,17 +204,18 @@ void * consumer_routine(void * arg) {
 
 		// -- wait for barber seat to be free
 		pthread_cond_wait(&waiting_on_barber_cond, &barber_mutex);
-		printf("Customer [%d]: I'm to be served.\n", consumer_number);
-		printf("Customer [%d]: sit on the barber chair.\n", consumer_number);
-		pthread_cond_signal(&empty_chairs_cond);
 
-		printf("Customer [%d]: I'm being served.\n", consumer_number);
+		// printf("Customer [%d]: I'm to be served.\n", consumer_number);
+		// printf("Customer [%d]: sit on the barber chair.\n", consumer_number);
+		// pthread_cond_signal(&empty_chairs_cond);
 
-		// -- wait for barber to finish cutting hair
-		pthread_cond_wait(&being_served_cond, &barber_mutex);
-		printf("Customer [%d]: Well done. Thank barber, bye!\n", consumer_number);
+		// printf("Customer [%d]: I'm being served.\n", consumer_number);
 
-		tickets[ticket_number] = 0;
+		// // -- wait for barber to finish cutting hair
+		// pthread_cond_wait(&being_served_cond, &barber_mutex);
+		// printf("Customer [%d]: Well done. Thank barber, bye!\n", consumer_number);
+
+		// tickets[ticket_number] = 0;
 		
 	}
 
