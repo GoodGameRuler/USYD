@@ -11,9 +11,11 @@ int last_ticket_called;
 int no_of_chairs_occupied;
 int ticket_number;
 int barber_busy;
+int work_ended;
 
 void * barber_routine(void *);
 void * consumer_routine(void *);
+void * assistant_routine();
 
 //declare global mutex and condition variables
 pthread_mutex_t chair_mutex;
@@ -47,6 +49,7 @@ int main(int argc, char ** argv)
 	ticket_number = 0;
 	barber_busy = 0;
 	last_ticket_called = 0;
+	work_ended = 0;
 
 	// ask for number of chairs
 	printf("Enter the number of seats at the Barber's shop (int): \n");
@@ -154,49 +157,68 @@ void * assistant_routine(void * arg) {
 	int *work_pace;
 	int serve_time = 15;
 	work_pace = (int *) arg;
-	while (0) {
+	while (1) {
 		pthread_mutex_lock(&barber_mutex);
 
 		if(no_of_chairs_occupied == 0) {
-			printf("Assistant: I’m waiting for customers.");
-			pthread_cond_wait(&empty_chairs_cond);
+			printf("Assistant: I’m waiting for customers.\n");
+			pthread_cond_wait(&empty_chairs_cond, &barber_mutex);
 		}
 
 		if(barber_busy) {
-			printf("Assistant: I’m waiting for barber to become available.");
-			pthread_cond_wait(&waiting_on_barber_cond)
+			printf("Assistant: I’m waiting for barber to become available.\n");
+			pthread_cond_wait(&waiting_on_barber_cond, &barber_mutex);
 		}
 
-		printf("Assistant: Call one customer with a ticket numbered n.");
-		pthread_cond_broadcast(&waiting_on_assistant_cond);
-		pthread_cond_signal(&waiting_on_customer_cond);
+		if(!barber_busy) {
+			barber_busy = 1;
+			int ticket_to_be_called = last_ticket_called >= no_of_chairs ? 1 : last_ticket_called + 1;
+			printf("Assistant: Call one customer with a ticket numbered %d.\n", ticket_to_be_called);
+			pthread_cond_broadcast(&waiting_on_assistant_cond);
+
+			pthread_cond_signal(&waiting_on_customer_cond);
+		}
 
 		pthread_mutex_unlock(&barber_mutex);
 	}
 
-	printf("Assistant: Hi Barber, we’ve finished the work for the day.");
-	pthread_cond_broadcast(&empty_Chairs_cond);
+	printf("Assistant: Hi Barber, we’ve finished the work for the day.\n");
+	pthread_cond_signal(&waiting_on_customer_cond);
 }
 
 void * barber_routine(void * arg) {
 	pace_t* serve_pace;
 	serve_pace = (pace_t *) arg;
 
-	boolean work_ended = false;
-
-	while (!work_ended) {
+	while (work_ended == 0) {
 		sleep((int)rand() % 5 + 1);
 		pthread_mutex_lock(&chair_mutex);
-		
-		pthread_cond_wait(&waiting_on_customer_cond, &chair_mutex);
+
+		printf("Barber: I’m now ready to accept a new customer.\n");
+
+		if(barber_busy == 0)
+			pthread_cond_wait(&waiting_on_customer_cond, &chair_mutex);
+
+		if(work_ended != 0) {
+			break;
+		}
+
+		printf("Barber: Hello, customer %d\n", last_ticket_called);
 
 		// Cut hair for customer
-		sleep(((int) rand() % (serve_pace->max_pace - sleep_pace->min_pace)) + serve_pace->min_pace);
+		sleep(((int) rand() % (serve_pace->max_pace - serve_pace->min_pace)) + serve_pace->min_pace);
+
+		printf("Barber: Finished cutting. Good bye, customer %d.\n", last_ticket_called);
+
+		barber_busy = 0;
 
 		pthread_cond_signal(&being_served_cond);
+		pthread_cond_signal(&waiting_on_barber_cond);
 
 		pthread_mutex_unlock(&chair_mutex);
 	}
+	
+	printf("Barber: Thank Assistant and see you tomorrow!\n");
 
 }
 
@@ -204,35 +226,21 @@ void * consumer_routine(void * arg) {
 	
 	int* consumer_number = (int *)arg;
 	int ticket_number = -1;
-	printf("Customer [%d]: I have arrived at the barber shop.", *consumer_number);
+	printf("Customer [%d]: I have arrived at the barber shop.\n", *consumer_number);
 	
 	pthread_mutex_lock(&barber_mutex);
     	if (no_of_chairs_occupied == no_of_chairs) {
-		printf("Customer [%d]: oh no! all seats have been taken and I'll leave now!\n", consumer_number);
+		printf("Customer [%d]: oh no! all seats have been taken and I'll leave now!\n", *consumer_number);
 
 	} else { 
-		
-		// int i = 0;
-		// while(i < no_of_chairs && ticket_number == -1) {
-		// 	if(tickets[i] == 0) {
-		// 		ticket_number = i;
-		// 		tickets[i] = 1
-
-		// 	}
-
-		// 	i++
-		// }
-
-		
 		last_ticket_no = last_ticket_no > no_of_chairs ? 1 : last_ticket_no + 1;
 	
-		printf("Customer [%d]: I'm lucky to get a free seat and a ticket numbered %d\n", consumer_number, last_ticket_no);
+		printf("Customer [%d]: I'm lucky to get a free seat and a ticket numbered %d\n", *consumer_number, last_ticket_no);
 
 		if(no_of_chairs_occupied == 0) {
 		    pthread_cond_signal(&empty_chairs_cond);
 
 		}
-
 
 		no_of_chairs_occupied++;
 
@@ -242,7 +250,7 @@ void * consumer_routine(void * arg) {
 		}
 
 		// -- wait for barber seat to be free
-		int ticket_to_be_called = last_ticket_called > no_of_chairs ? 1 : last_ticket_called + 1;
+		int ticket_to_be_called = last_ticket_called >= no_of_chairs ? 1 : last_ticket_called + 1;
 		do {
 			pthread_cond_wait(&waiting_on_assistant_cond, &barber_mutex);
 
@@ -251,18 +259,15 @@ void * consumer_routine(void * arg) {
 		last_ticket_called = ticket_to_be_called;
 		no_of_chairs_occupied--;
 
-		printf("Customer [%d]: I'm to be served.\n", consumer_number);
-		printf("Customer [%d]: sit on the barber chair.\n", consumer_number);
+		printf("Customer [%d]: I'm to be served.\n", *consumer_number);
+		printf("Customer [%d]: sit on the barber chair.\n", *consumer_number);
 
-		printf("Customer [%d]: I'm being served.\n", consumer_number);
+		printf("Customer [%d]: I'm being served.\n", *consumer_number);
 
 		// // -- wait for barber to finish cutting hair
 		pthread_cond_wait(&being_served_cond, &barber_mutex);
-		printf("Customer [%d]: Well done. Thank barber, bye!\n", consumer_number);
-
-		// tickets[ticket_number] = 0;
+		printf("Customer [%d]: Well done. Thank barber, bye!\n", *consumer_number);
 	}
 
 	pthread_mutex_unlock(&barber_mutex);
-
 }
