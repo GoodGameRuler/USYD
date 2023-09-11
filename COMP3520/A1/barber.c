@@ -21,6 +21,7 @@ pthread_mutex_t barber_mutex;
 pthread_cond_t full_chairs_cond;
 pthread_cond_t empty_chairs_cond;
 pthread_cond_t waiting_on_barber_cond;
+pthread_cond_t waiting_on_customer_cond;
 pthread_cond_t waiting_on_assistant_cond;
 pthread_cond_t sitting_on_chair_cond;
 pthread_cond_t being_served_cond;
@@ -79,6 +80,7 @@ int main(int argc, char ** argv)
 	pthread_cond_init(&empty_chairs_cond, NULL);
 	pthread_cond_init(&waiting_on_barber_cond, NULL);
 	pthread_cond_init(&waiting_on_assistant_cond, NULL);
+	pthread_cond_init(&waiting_on_customer_cond, NULL);
 	pthread_cond_init(&being_served_cond, NULL);
 	pthread_cond_init(&sitting_on_chair_cond, NULL);
 
@@ -141,6 +143,7 @@ int main(int argc, char ** argv)
 	pthread_cond_destroy(&empty_chairs_cond);
 	pthread_cond_destroy(&waiting_on_barber_cond);
 	pthread_cond_destroy(&waiting_on_assistant_cond);
+	pthread_cond_destroy(&waiting_on_customer_cond);
 	pthread_cond_destroy(&sitting_on_chair_cond);
 	pthread_cond_destroy(&being_served_cond);
 	
@@ -166,6 +169,7 @@ void * assistant_routine(void * arg) {
 
 		printf("Assistant: Call one customer with a ticket numbered n.");
 		pthread_cond_broadcast(&waiting_on_assistant_cond);
+		pthread_cond_signal(&waiting_on_customer_cond);
 
 		pthread_mutex_unlock(&barber_mutex);
 	}
@@ -178,14 +182,20 @@ void * barber_routine(void * arg) {
 	pace_t* serve_pace;
 	serve_pace = (pace_t *) arg;
 
-	while (1) {
-		sleep ((int)rand() % 5) + 1;
+	boolean work_ended = false;
+
+	while (!work_ended) {
+		sleep((int)rand() % 5 + 1);
 		pthread_mutex_lock(&chair_mutex);
 		
+		pthread_cond_wait(&waiting_on_customer_cond, &chair_mutex);
 
+		// Cut hair for customer
+		sleep(((int) rand() % (serve_pace->max_pace - sleep_pace->min_pace)) + serve_pace->min_pace);
+
+		pthread_cond_signal(&being_served_cond);
 
 		pthread_mutex_unlock(&chair_mutex);
-
 	}
 
 }
@@ -247,7 +257,7 @@ void * consumer_routine(void * arg) {
 		printf("Customer [%d]: I'm being served.\n", consumer_number);
 
 		// // -- wait for barber to finish cutting hair
-		// pthread_cond_wait(&being_served_cond, &barber_mutex);
+		pthread_cond_wait(&being_served_cond, &barber_mutex);
 		printf("Customer [%d]: Well done. Thank barber, bye!\n", consumer_number);
 
 		// tickets[ticket_number] = 0;
