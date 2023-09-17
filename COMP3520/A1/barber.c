@@ -203,12 +203,14 @@ void * barber_routine(void * arg) {
 			break;
 		}
 
+		pthread_mutex_lock(&barber_mutex);
 		printf("Barber: Hello, customer %d\n", last_ticket_called);
 
 		// Cut hair for customer
 		sleep(((int) rand() % (serve_pace->max_pace - serve_pace->min_pace)) + serve_pace->min_pace);
 
 		printf("Barber: Finished cutting. Good bye, customer %d.\n", last_ticket_called);
+		pthread_mutex_unlock(&barber_mutex);
 
 		barber_busy = 0;
 
