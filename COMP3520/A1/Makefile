@@ -1,5 +1,8 @@
-build:
+TARGET=barber
+
+$(TARGET): $(TARGET).c
 	gcc -o barber barber.c
 
-run:
+run: $(TARGET)
 	./barber
+

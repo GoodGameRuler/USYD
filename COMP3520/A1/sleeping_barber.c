@@ -4,9 +4,13 @@
 #include <stdlib.h>
 #include <time.h>
 
+// Sleep Func
+#include <unistd.h>
+
 int no_of_consumers;
 int no_of_chairs;
 int no_of_chairs_occupied;
+int last_ticket_no;
 
 void * barber_routine(void *);
 void * consumer_routine(void *);
@@ -26,8 +30,7 @@ typedef struct {
 
 } pace_t;
 
-int main(int argc, char ** argv)
-{
+int main(int argc, char ** argv) {
 	pthread_t *threads; //system thread id
 	int *t_ids; //user-defined thread id
 	pace_t barbers_pace;
@@ -35,6 +38,7 @@ int main(int argc, char ** argv)
  	int k, rc, t;
 
 	no_of_chairs_occupied = 0;
+    last_ticket_no = 0;
 	
 	// ask for number of chairs
 	printf("Enter the number of seats at the Barber's shop (int): \n");
@@ -93,7 +97,7 @@ int main(int argc, char ** argv)
 	srand(time(0));
 	for (k = 1; k<no_of_consumers; k++)
 	{
-		sleep((int)rand() % (consumer_pace.max_pace - consumer_pace.min_pace + 1) + consumer_pace.min_pace); //sleep a few second before creating a thread
+		sleep((int)rand() % (consumer_rate.max_pace - consumer_rate.min_pace + 1) + consumer_rate.min_pace); //sleep a few second before creating a thread
 		t_ids[k] = k;
 		rc = pthread_create(&threads[k], NULL, consumer_routine, (void *)&t_ids[k]); //consumer routine takes thread id as the arg
 		if (rc) {
@@ -133,7 +137,7 @@ void * barber_routine(void * arg) {
 	work_pace = (pace_t*) arg;
 	while (1)
 	{
-		sleep (*serve_time);
+		sleep(serve_time);
 		pthread_mutex_lock(&chair_mutex);
 			if(no_of_chairs_occupied == 0) {
 				printf("Barber: The number of free seats is %d. No customers waiting and I'll go to sleep.\n", no_of_chairs);
@@ -144,7 +148,7 @@ void * barber_routine(void * arg) {
 				pthread_cond_signal(&waiting_on_barber_cond);
 				pthread_cond_wait(&sitting_on_chair_cond, &chair_mutex);
 				
-				pthread_mutex_trylock(&barber_mutex);
+				pthread_mutex_lock(&barber_mutex);
 				no_of_chairs_occupied--;
 				
 				printf("Barber: Start serving the customer.\n");
@@ -163,7 +167,7 @@ void * consumer_routine(void * arg) {
 	int consumer_number = *((int *)arg);
 	printf("Customer %d arrives.\n", consumer_number);
 	
-	pthread_mutex_trylock(&barber_mutex);
+	pthread_mutex_lock(&barber_mutex);
     if (no_of_chairs_occupied == no_of_chairs) {
 		printf("Customer %d: oh no! all seats have been taken and I'll leave now!\n", consumer_number);
 
