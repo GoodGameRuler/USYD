@@ -1,0 +1,106 @@
+\documentclass[a4paper]{article}
+\usepackage[utf8]{inputenc}
+
+\title{OLET2610 - Foundations of Quantum Computing Report}
+\author{SID: 500700976}
+\date{08/09/2023}
+
+\usepackage{amsmath}
+
+\usepackage{amsfonts}
+
+%% USE ALPHANUMERICS FOR LISTS %%
+\usepackage{enumitem}
+
+\usepackage{amssymb}
+
+\usepackage{graphicx}
+\graphicspath{ {./img/} }
+
+\usepackage{geometry}
+\renewcommand{\baselinestretch}{1.25}
+
+%\setlength{\parskip}{\baselineskip} %adds an extra new line after a paragraph
+\setlength{\parindent}{0pt} % removes indent of new paragraphs
+
+\usepackage{titletoc}
+
+\usepackage[svgnames]{xcolor}
+\usepackage[most]{tcolorbox}
+\usetikzlibrary{shadings}
+
+% \usepackage[style=apa, backend=biber]{biblatex}
+% \addbibresource{ref.bib}
+
+\usepackage[style=apa, backend=biber]{biblatex}
+\addbibresource{ref.bib}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{OLET2610}
+\chead{08/09/2023}
+\rhead{Report}
+
+%\setlength{\parskip}{\baselineskip} %adds an extra new line after a paragraph
+\setlength{\parindent}{0pt} % removes indent of new paragraphs
+
+\begin{document}
+
+\maketitle
+\newpage
+
+%TODO
+
+\section{Executive Summary}
+\section{Introduction to Quantum Computing}
+\subsection{What is Quantum Computing  - A peek into the rabbit whole}
+Defining quantum computing and its applications is incredibly difficult to do. Just the fact that the technology is potentially a decade away from completion, makes it quite difficult to predict how the technology will look like, or what applications it will have. For this reason this report won't attempt to look to far ahead or too far into the details of Quantum Computing. Instead, this report will make comparisons between the current differences between conventional computing and its quantum counterpart, and attempt to make judgements purely based on those differences.
+
+Firstly, what needs to be understood is that Quantum Computing is not just a means of a faster computation speeds (\cite{unknown-author-2023}); it inherently is a very different way of thinking about computing and mathematics. It is not just a means of encoding more information; statements like these, while not necessarily inaccurate, simplify and misconstrue the meaning that of the system of thinking that is known as Quantum Computing. So, what is Quantum Computing?
+
+\subsubsection{Introduction to Quantum}
+Quantum Computing is encoding computers based on quantum phenomena. This may be quite cyclic definition, but bear with this; all will be explained as the report flows. Therefore, before the details of Quantum Computing are explained it may be quite essential to understand the basics of Quantum Physics.
+
+\begin{enumerate}
+	\item \textbf{Quantum System} - A Quantum System simply put is a collection of components to which quantum mechanics applies. It is quite difficult to describe quantum systems by their physical properties (without having to account for many, many exceptions) (will be explained in Section \ref{ref:platforms}). Rather, it is easier to say that quantum systems are a classification of systems that all behave similarly. Quantum systems have components that behave like waves, and particles. Think of how light waves (coloured ones for example) can interact and behave with each other: mixing coloured light together in a particular way leads to the waves \textit{\textbf{interfering}} with each other and forming another colour. Waves have many properties that particles do not show. In summary for a system to be a quantum one, its components must have the property of \textbf{\textit{wave-particle duality}}, and they must exhibit certain behaviours like superposition, and interference, while interacting with each other (\cite{carcassi-2021}).
+	\item \textbf{Quantum State and Property of Measurement} - Quantum State will in this report be the most nuanced terminology to define. The explanation this report will cover will be reduced in definition
+
+	      Quantum State in-terms of its straight forward interpretation is quite simple. It is the state of a Quantum System: the properties, and attributes describing a Quantum System all compiled into one idea. The difference when describing the state of a conventional system than a quantum system, is that quantum systems are not conventionally measurable. For example height is a conventionally measurable quantity. By looking at a person you can estimate how tall the person is. More importantly the act of measuring a person's height does not change how tall the person is nor is their any kind of price that is pay by measuring a person's height. Quantum Systems are not conventionally measurable, for two reasons.
+	      \begin{itemize}
+		      \item Quantum Systems can not be observed until we interact with the system. Our original analogy can't be extended to show this. However, think about Quantum Systems (sometimes) like a coin before it is flipped. Observes (such as those reading this report) cannot conclude whether the coin is heads or tails, without going in and flipping the coin.
+		      \item Quantum Systems experience something that is known as the observer's effect. Recall how when a person's height is measured, the underlying property that is being measured is not effected. This is not true for Quantum Systems. By measuring a Quantum System there is a price to pay - the loss of information of the system. Think about the coin flipping example; before the coin is flipped and the result has not been observed, the potential result that could be observed is heads or tails. In this example it 50\% probability for either. However, should an observer attempt \textit{observer} a result, the system \textbf{collapses} to a result: heads or tails, and information regarding the original state (and it's probabilities) are lost.
+	      \end{itemize}
+
+	      In theoretical Physics both these affects are collectively referred to be \textbf{\textit{the collapsing of a wave function}}.
+	\item \textbf{Superposition} -
+	\item \textbf{Interference} -
+	\item \textbf{Entanglement} -
+\end{enumerate}
+
+\subsubsection{Quantum Computing Finally Explained}
+
+Now that the fundamentals of Quantum Systems have been explained, what is Quantum Computing? How do all these theoretical physics concepts come together to potentially bring about a large revolution in computing. The answer to these questions come in the way encoding changes with the advancement of being able to utilise fundamental properties of Quantum Systems. Imagine the potential of being able to take two entangled particles, separate the entangled particles, and then communicate information through entangled particles. Recall that entangled particles will always return the same output should the be measured. Theoretically if two computers had one entangled particle of a pair each, those computers could instantly communicate information to and fro.
+
+It is easiest to understand Quantum Computing by contrasting it with the logic and processes of Conventional Computing. Conventional Computing encodes its information with discrete, and dictated states known in the form of binary information. Computers used capacitors, and resistors to store information about whether a bit value is 1 or 0. Then conventional computers perform operations using gates to manipulate said information. Quantum Computing changes that fundamental model of thinking: that there be two discrete, and distinct states that each unit ("bit") can take. Quantum Bits or QBits ("the fundamental unit of operations of Quantum Computers") take more of a continuous approach. Think of a door, a door can be open, a door can be closed, however a door can also be somewhere in between. QBits are quite similar to this analogy. QBits can take the distinct 0 or 1 value, but they may also take a value in between. QBits having this in between value, are known as \textbf{\textit{"to be in superposition"}}. With this and different mechanisms of Quantum Systems it is possible to extract many more functionalities and operations on these "QBits" than on Conventional Bits. This leads to ("partly theoretical and partly proven") faster computation times in particular applications (See Section \ref{ref:applications} for more information).
+
+\subsubsection{Introduction to QBits and Quantum Gates}
+
+The previous section briefly introduced the concept of QBits, and their potentials. Recall that Quantum Bits, similar to Conventional Bits, can take the value of 0 and 1, but they can also be in superposition - a state in between. This section will not briefly introduce two gates that operate on Quantum Bits.
+\begin{itemize}
+	\item The X Gate -
+	\item The Hadamard Gate -
+	\item The CNot Gate - is a
+\end{itemize}
+
+Welcome to Quantum Computing! Ha!
+
+\section{Platforms}
+\label{ref:platforms}
+\subsection{What are platforms?}
+\subsection{Spin QBits/Current State}
+\subsection{Potential Applications}
+\label{ref:applications}
+\printbibliography
+\nocite{*}
+
+\end{document}
