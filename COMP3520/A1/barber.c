@@ -164,7 +164,7 @@ int main(int argc, char **argv) {
     sleep(1); // sleep a few second before creating a thread
     barb_infos[k].barber_id = k + 1;
     rc = pthread_create(
-        &threads[k], NULL, customer_routine,
+        &threads[k], NULL, barber_routine,
         (void *)&barb_infos[k]); // barber routine takes thread id as the arg
 
     if (rc) {
@@ -312,23 +312,26 @@ void *barber_routine(void *arg) {
       break;
     }
 
-    printf("Barber: I’m now ready to accept a new customer.\n");
+    printf("Barber [%d]: I’m now ready to accept a new customer.\n",
+           barber_n_info->barber_id);
 
     if (barber_n_info->barber_busy == 0)
       pthread_cond_wait(&waiting_on_customer_cond, &barber_mutex);
 
-    printf("Barber: Hello, customer %d\n", barber_n_info->customer_ticket_no);
+    printf("Barber [%d]: Hello, customer with ticket number %d\n",
+           barber_n_info->customer_ticket_no, barber_n_info->barber_id);
 
     // Cut hair for customer
     sleep(((int)rand() % (barbers_pace.max_pace - barbers_pace.min_pace)) +
           barbers_pace.min_pace);
 
-    printf("Barber: Finished cutting. Good bye, customer %d.\n",
-           barber_n_info->customer_ticket_no);
+    printf("Barber [%d}: Finished cutting. Good bye, customer %d.\n",
+           barber_n_info->barber_id, barber_n_info->customer_ticket_no);
 
     pthread_cond_signal(&being_served_cond);
-    printf("Barber: Waiting for customer with ticket %d to leave.\n",
-           barber_n_info->customer_ticket_no);
+    printf("Barber [%d]: Waiting for customer with ticket %d to leave.\n",
+           barber_n_info->barber_id, barber_n_info->customer_ticket_no);
+
     pthread_cond_wait(&confirm_customer_left_cond, &barber_mutex);
 
     barber_n_info->barber_busy = 0;
