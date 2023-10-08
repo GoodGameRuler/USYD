@@ -1,4 +1,4 @@
-package invaders.entityAbstractions;
+package invaders.entities.Builders;
 
 import invaders.entities.Bunker;
 import invaders.physics.Vector2D;

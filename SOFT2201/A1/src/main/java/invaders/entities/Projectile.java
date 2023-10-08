@@ -1,4 +1,4 @@
 package invaders.entities;
 
-public class Projectile {
+public interface Projectile {
 }

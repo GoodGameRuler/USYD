@@ -1,5 +1,6 @@
 package invaders.entities;
 
+import invaders.GameObject;
 import invaders.logic.Damagable;
 import invaders.physics.Moveable;
 import invaders.physics.Vector2D;
@@ -8,7 +9,7 @@ import javafx.scene.image.Image;
 
 import java.io.File;
 
-public class PlayerProjectile implements Renderable, Moveable, Damagable, Projectile {
+public class EnemyProjectile implements Renderable, Moveable, Damagable, Projectile, GameObject {
 
     private Vector2D position;
     private Vector2D direction;
@@ -18,13 +19,15 @@ public class PlayerProjectile implements Renderable, Moveable, Damagable, Projec
 
     private double damage;
     private int speed;
+    private boolean alive;
 
-    public PlayerProjectile(Vector2D position, Vector2D direction, int damage, int speed) {
-        this.position = new Vector2D(x, y);
+    public EnemyProjectile(Vector2D position, Vector2D direction, int damage, int speed) {
         this.direction = direction;
         this.image = new Image(new File("src/main/resources/player.png").toURI().toString(), width, height, true, true);
         this.damage = damage;
         this.speed = speed;
+        this.position = position;
+        this.alive = true;
     }
 
     @Override
@@ -70,8 +73,10 @@ public class PlayerProjectile implements Renderable, Moveable, Damagable, Projec
 
     @Override
     public void takeDamage(double amount) {
-        this.damage -= damage;
-
+        if(damage > 0)
+            this.damage -= damage;
+        else
+            this.alive = false;
     }
 
     @Override
@@ -81,6 +86,16 @@ public class PlayerProjectile implements Renderable, Moveable, Damagable, Projec
 
     @Override
     public boolean isAlive() {
-        return this.damage > 0;
+        return this.alive;
+    }
+
+    @Override
+    public void start() {
+
+    }
+
+    @Override
+    public void update() {
+
     }
 }

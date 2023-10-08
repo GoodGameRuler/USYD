@@ -1,4 +1,5 @@
-package invaders.entityAbstractions;
+package invaders.entities.Strategies;
 
 public interface EnemyProjectileStartegy {
+    public
 }

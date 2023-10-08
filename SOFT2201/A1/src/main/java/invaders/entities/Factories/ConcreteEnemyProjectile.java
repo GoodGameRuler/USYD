@@ -1,4 +1,4 @@
-package invaders.entityAbstractions;
+package invaders.entities.Factories;
 
 import invaders.entities.EnemyProjectile;
 import invaders.entities.Projectile;

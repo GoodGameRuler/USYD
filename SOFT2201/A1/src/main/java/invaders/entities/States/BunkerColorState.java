@@ -1,4 +1,4 @@
-package invaders.entityAbstractions;
+package invaders.entities.States;
 
 import javafx.scene.image.Image;
 

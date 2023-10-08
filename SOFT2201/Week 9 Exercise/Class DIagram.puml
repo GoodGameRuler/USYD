@@ -1,27 +1,49 @@
 @startuml
-'https://plantuml.com/class-diagram
 
-abstract class AbstractList
-abstract AbstractCollection
-interface List
-interface Collection
+package "Factory Example" {
+    interface Creator
+    class ConcreteCreator
+    class Product
+    class ConcreteProduct
+    class FactoryContext
 
-List <|-- AbstractList
-Collection <|-- AbstractCollection
+    Creator <|.. ConcreteCreator
+    Creator <.. Product
+    Product <|-- ConcreteProduct
+    FactoryContext --> Creator
 
-Collection <|- List
-AbstractCollection <|- AbstractList
-AbstractList <|-- ArrayList
-
-class ArrayList {
-Object[] elementData
-size()
+    Creator : +createProduct()
+    ConcreteCreator : +createProduct()
+    Product : +performOperation()
+    FactoryContext : -creator: Creator
+    FactoryContext : +clientCode()
+    FactoryContext : +setCreator(creator: Creator)
+    ConcreteProduct : +additionalMethod1()
+    ConcreteProduct : +additionalMethod2()
 }
 
-enum TimeUnit {
-DAYS
-HOURS
-MINUTES
+package "Builder Example" {
+    class CarDirector
+    class CarBuilder
+    class ConcreteCarBuilder
+    class CarProduct
+    class CarAssemblyContext
+
+    CarDirector --> CarBuilder
+    CarBuilder <|-- ConcreteCarBuilder
+    CarDirector *--> CarProduct
+    CarAssemblyContext *--> CarDirector
+
+    CarDirector : +constructCar()
+    CarBuilder : +buildEngine()
+    CarBuilder : +buildChassis()
+    CarBuilder : +buildInterior()
+    CarProduct : +assembleParts()
+    CarAssemblyContext : -director: CarDirector
+    CarAssemblyContext : +setDirector(director: CarDirector)
+    CarAssemblyContext : +assembleCar(builder: CarBuilder)
+    CarProduct : +additionalFeature1()
+    CarProduct : +additionalFeature2()
 }
 
 @enduml

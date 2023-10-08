@@ -1,5 +1,6 @@
 package invaders.entities;
 
+import invaders.GameObject;
 import invaders.logic.Damagable;
 import invaders.physics.Moveable;
 import invaders.physics.Vector2D;
@@ -8,7 +9,7 @@ import javafx.scene.image.Image;
 
 import java.io.File;
 
-public class Projectile implements Renderable, Moveable, Damagable {
+public class PlayerProjectile implements Renderable, Moveable, Damagable, Projectile, GameObject {
 
     private Vector2D position;
     private Vector2D direction;
@@ -18,13 +19,16 @@ public class Projectile implements Renderable, Moveable, Damagable {
 
     private double damage;
     private int speed;
+    private boolean alive;
+    private Player player;
 
-    public Projectile(double x, double y, Vector2D direction, int damage, int speed) {
-        this.position = new Vector2D(x, y);
-        this.direction = direction;
+    public PlayerProjectile(Vector2D position, Player p) {
         this.image = new Image(new File("src/main/resources/player.png").toURI().toString(), width, height, true, true);
-        this.damage = damage;
-        this.speed = speed;
+        this.damage = 1;
+        this.speed = 5;
+        this.position = position;
+        this.alive = true;
+        this.player = p;
     }
 
     @Override
@@ -54,12 +58,11 @@ public class Projectile implements Renderable, Moveable, Damagable {
 
     @Override
     public void up() {
-        this.position.setY(this.position.getX() + this.direction.getY() * speed);
+        this.position.setY(this.position.getY() - speed);
     }
 
     @Override
     public void down() {
-        this.position.setY(this.position.getX() - this.direction.getY() * speed);
     }
 
     @Override
@@ -70,8 +73,10 @@ public class Projectile implements Renderable, Moveable, Damagable {
 
     @Override
     public void takeDamage(double amount) {
-        this.damage -= damage;
-
+        if(damage > 0)
+            this.damage -= damage;
+        else
+            this.alive = false;
     }
 
     @Override
@@ -81,6 +86,20 @@ public class Projectile implements Renderable, Moveable, Damagable {
 
     @Override
     public boolean isAlive() {
-        return this.damage > 0;
+        return this.alive;
+    }
+
+    @Override
+    public void start() {
+
+    }
+
+    @Override
+    public void update() {
+        this.up();
+        if(this.getPosition().getY() <= 0) {
+            this.alive = false;
+            this.player.toggleActiveProjectile();
+        }
     }
 }
