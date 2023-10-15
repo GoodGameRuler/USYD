@@ -1,0 +1,433 @@
+@startuml
+
+package Invaders {
+    package engine {
+        class GameEngine {
+            - gameobjects: List<GameObject>
+            - renderables: List<Renderable>
+            - player: Player
+            - left: boolean
+            - right: boolean
+            + GameEngine(config: String)
+            + update()
+            + getRenderables(): List<Renderable>
+            + leftReleased()
+            + rightReleased()
+            + leftPressed()
+            + rightPressed()
+            + shootPressed(): boolean
+            - movePlayer()
+          }
+
+        class GameWindow {
+            - width: int
+            - height: int
+            - scene: Scene
+            - pane: Pane
+            - model: GameEngine
+            - entityViews: List<EntityView>
+            - background: Renderable
+            - xViewportOffset: double
+            - yViewportOffset: double
+            + GameWindow(model: GameEngine, width: int, height: int)
+            + run()
+            - draw()
+            + getScene(): Scene
+        }
+
+        class KeyboardInputHandler {
+            - model: GameEngine
+            - left: boolean
+            - right: boolean
+            - pressedKeys: Set<KeyCode>
+            - sounds: Map<String, MediaPlayer>
+            + KeyboardInputHandler(model: GameEngine)
+            + handlePressed(keyEvent: KeyEvent)
+            + handleReleased(keyEvent: KeyEvent)
+        }
+    }
+
+    package entities {
+        package Builders {
+            interface AlienBuilder <<interface>> {
+                + setPosition(position: Vector2D): AlienBuilder
+                + setWidth(width: double): AlienBuilder
+                + setHeight(height: double): AlienBuilder
+                + build(): Alien
+            }
+
+            interface BunkerBuilder <<interface>> {
+                + setPosition(position: Vector2D): AlienBuilder
+                    + setWidth(width: double): AlienBuilder
+                    + setHeight(height: double): AlienBuilder
+                    + build(): Alien
+            }
+
+            class ConcreteAlienBuilder implements AlienBuilder{
+               - alien: Alien
+               - position: Vector2D
+               - height: double
+               - width: double
+               + setPosition(position: Vector2D): AlienBuilder
+               + setWidth(width: double): AlienBuilder
+               + setHeight(height: double): AlienBuilder
+               + build(): Alien
+            }
+
+            class ConcreteBunkerBuilder implements BunkerBuilder {
+                - position: Vector2D
+                - width: double
+                - height: double
+                + setPosition(position: Vector2D): BunkerBuilder
+                + setWidth(width: double): BunkerBuilder
+                + setHeight(height: double): BunkerBuilder
+                + build(): Bunker
+            }
+        }
+
+        package Factories {
+            interface ProjectileCreator <<interface>> {
+                +createProjectile(position: Vector2D)): Projectile
+            }
+
+            class ConcreteEnemyProjectile implements ProjectileCreator {
+                + createProjectile(position: Vector2D): Projectile
+            }
+
+            class ConcretePlayerProjectile implements ProjectileCreator {
+                + createProjectile(position: Vector2D): Projectile
+            }
+        }
+
+        package States {
+            interface BunkerColorState <<interface>> {
+                + returnImage(): Image
+            }
+
+            class GreenBunkerState implements BunkerColorState {
+                + returnImage(): Image
+            }
+
+            class YellowBunkerState implements BunkerColorState {
+                + returnImage(): Image
+            }
+
+            class RedBunkerState implements BunkerColorState {
+                + returnImage(): Image
+            }
+        }
+
+        package Strategies {
+            interface EnemyProjectileStrategy <<interface>> {
+                +behaviour(position: Vector2D)): Vector2D
+            }
+
+            interface EnemyProjectileCreationStrategy <<interface>> {
+                +createProjectile(position: Vector2D)): Projectile
+            }
+
+            class BasicProjectileCreationStrategy implements EnemyProjectileCreationStrategy {
+            - projectiles: ArrayList<Projectile>
+                - pc: ProjectileCreator
+                + BasicProjectileCreationStrategy()
+                + createProjectile(position: Vector2D): Projectile
+
+            }
+
+            class ShootDownStrategy implements EnemyProjectileStrategy {
+            - speed: int
+                + ShootDownStrategy(speed: int)
+                + behaviour(position: Vector2D): Vector2D
+            }
+        }
+
+        class Alien {
+            - health: int
+            - width: double
+            - height: double
+            - image: Image
+            - position: Vector2D
+            - alive: boolean
+            - projectileCreationStrategy: EnemyProjectileCreationStrategy
+            + Alien(position: Vector2D, width: double, height: double)
+            + takeDamage(amount: double): void
+            + getHealth(): double
+            + isAlive(): boolean
+            + getImage(): Image
+            + getWidth(): double
+            + getHeight(): double
+            + getPosition(): Vector2D
+            + getLayer(): Layer
+            + up(): void
+            + down(): void
+            + left(): void
+            + right(): void
+            + start(): void
+            + update(): void
+            + shoot(): Projectile
+            + setProjectileCreationStrategy(epcs: EnemyProjectileCreationStrategy): Alien
+          }
+
+          class Bunker {
+            - position: Vector2D
+            - health: double
+            - height: double
+            - width: double
+            - image: Image
+            - bunkerStates: ArrayList<BunkerColorState>
+            - stateIndex: int
+            - alive: boolean
+            + Bunker(position: Vector2D, height: double, width: double)
+            + takeDamage(amount: double): void
+            + getHealth(): double
+            + isAlive(): boolean
+            + getImage(): Image
+            + getWidth(): double
+            + getHeight(): double
+            + getPosition(): Vector2D
+            + getLayer(): Layer
+            + changeState(): void
+            + start(): void
+            + update(): void
+          }
+
+          class EnemyProjectile {
+            - position: Vector2D
+            - direction: Vector2D
+            - image: Image
+            - width: double
+            - height: double
+            - damage: double
+            - speed: int
+            - alive: boolean
+            - startegy: EnemyProjectileStrategy
+            + EnemyProjectile(position: Vector2D, direction: Vector2D, damage: int, speed: int)
+            + getImage(): Image
+            + getWidth(): double
+            + getHeight(): double
+            + getPosition(): Vector2D
+            + getLayer(): Layer
+            + up(): void
+            + down(): void
+            + left(): void
+            + right(): void
+            + takeDamage(amount: double): void
+            + getHealth(): double
+            + isAlive(): boolean
+            + start(): void
+            + update(): void
+            + setStrategy(eps: EnemyProjectileStrategy): EnemyProjectile
+          }
+
+          class Player {
+            - position: Vector2D
+            - anim: Animator
+            - health: double
+            - width: double
+            - height: double
+            - image: Image
+            - activeProjectile: boolean
+            + Player(position: Vector2D)
+            + takeDamage(amount: double): void
+            + getHealth(): double
+            + isAlive(): boolean
+            + up(): void
+            + down(): void
+            + left(): void
+            + right(): void
+            + shoot(): Projectile
+            + getImage(): Image
+            + getWidth(): double
+            + getHeight(): double
+            + getPosition(): Vector2D
+            + getLayer(): Layer
+            + toggleActiveProjectile(): void
+          }
+
+          class PlayerProjectile {
+            - position: Vector2D
+            - direction: Vector2D
+            - image: Image
+            - width: double
+            - height: double
+            - damage: double
+            - speed: int
+            - alive: boolean
+            + PlayerProjectile(position: Vector2D)
+            + getImage(): Image
+            + getWidth(): double
+            + getHeight(): double
+            + getPosition(): Vector2D
+            + getLayer(): Layer
+            + up(): void
+            + down(): void
+            + left(): void
+            + right(): void
+            + takeDamage(amount: double): void
+            + getHealth(): double
+            + isAlive(): boolean
+            + start(): void
+            + update(): void
+          }
+
+        class SpaceBackground {
+            - space: Rectangle
+            - pane: Pane
+            - model: GameEngine
+            + SpaceBackground(engine: GameEngine, pane: Pane)
+            + getImage(): Image
+            + getWidth(): double
+            + getHeight(): double
+            + getPosition(): Vector2D
+            + getLayer(): Layer
+
+        }
+
+        class EntityViewImpl {
+            - entity: Renderable
+            - position: Vector2D
+            - delete: boolean
+            - node: ImageView
+            + EntityViewImpl(entity: Renderable)
+            + update(xViewportOffset: double, yViewportOffset: double): void
+            + matchesEntity(entity: Renderable): boolean
+            + markForDelete(): void
+            + getNode(): Node
+            + isMarkedForDelete(): boolean
+          }
+
+        interface EntityView <<interface>> {
+            + update(xViewportOffset: double, yViewportOffset: double): void
+            + matchesEntity(entity: Renderable): boolean
+            + markForDelete(): void
+            + getNode(): Node
+            + isMarkedForDelete(): boolean
+          }
+
+    }
+
+    package logic {
+        interface Damagable <<interface>> {
+        + takeDamage(amount: double): void
+            + getHealth(): double
+            + isAlive(): boolean
+        }
+    }
+
+    package physics {
+        class BoxCollider {
+            - width: double
+            - height: double
+            - position: Vector2D
+            + BoxCollider(width: double, height: double, position: Vector2D)
+            + getWidth(): double
+            + getHeight(): double
+            + getPosition(): Vector2D
+          }
+
+          interface Collider <<interface>> {
+            + getWidth(): double
+            + getHeight(): double
+            + getPosition(): Vector2D
+            + isColliding(col: Collider): boolean
+          }
+
+          interface Moveable <<interface>> {
+            + up(): void
+            + down(): void
+            + left(): void
+            + right(): void
+          }
+
+          class Vector2D {
+            - x: double
+            - y: double
+            + Vector2D(x: double, y: double)
+            + getX(): double
+            + getY(): double
+            + setX(x: double): void
+            + setY(y: double): void
+            + clone(): Vector2D
+            + clone(xShift: double, yShift: double): Vector2D
+          }
+    }
+
+    package rendering {
+        interface Animation <<interface>> {
+            + getName(): String
+            + getCurrentFrame(): Image
+            + next(): void
+          }
+
+          class Animator {
+            - animations: List<Animation>
+            - state: Animation
+            + Animator(animations: List<Animation>)
+            + setState(name: String): void
+            + getState(): Animation
+          }
+
+          interface Renderable <<interface>> {
+            + getImage(): Image
+            + getWidth(): double
+            + getHeight(): double
+            + getPosition(): Vector2D
+            + getLayer(): Layer
+          }
+
+          enum Layer {
+            BACKGROUND
+            FOREGROUND
+            EFFECT
+          }
+    }
+
+    class App {
+        +start(args: String[]): void
+        +main(stage: PrimaryStage): void
+    }
+
+    interface GameObject {
+        +start(): void
+        +update(): void
+    }
+}
+
+GameEngine -right-|> Renderable
+GameEngine -left-|> GameObject
+Alien -right-|> Renderable
+Alien -right-|> Damagable
+Alien -right-|> Moveable
+Alien -left-|> GameObject
+Alien ..> EnemyProjectileCreationStrategy
+Bunker -right-|> Renderable
+Bunker -right-|> Damagable
+Bunker -left-|> GameObject
+Player -right-|> Renderable
+Player -right-|> Damagable
+Player -right-|> Moveable
+Player -left-|> GameObject
+PlayerProjectile -right-|> Renderable
+
+GameWindow -- EntityViewImpl : uses
+GameWindow -- KeyboardInputHandler : uses
+KeyboardInputHandler -- Player : uses
+KeyboardInputHandler -- "invaders.entities.ProjectileCreator" : uses
+"invaders.entities.Alien" -- "invaders.entities.EntityViewImpl" : uses
+"invaders.entities.Bunker" -- "invaders.entities.EntityViewImpl" : uses
+"invaders.entities.Player" -- "invaders.entities.EntityViewImpl" : uses
+"invaders.entities.Player" -- "invaders.entities.ProjectileCreator" : uses
+"invaders.entities.PlayerProjectile" -- "invaders.entities.EntityViewImpl" : uses
+"invaders.entities.Factories.ConcreteAlienBuilder" -- "invaders.entities.Alien" : uses
+"invaders.entities.Factories.ConcreteBunkerBuilder" -- "invaders.entities.Bunker" : uses
+"invaders.entities.Factories.ConcreteEnemyProjectile" -- "invaders.entities.EnemyProjectile" : uses
+"invaders.entities.Factories.ConcretePlayerProjectile" -- "invaders.entities.PlayerProjectile" : uses
+"invaders.entities.Strategies.BasicProjectileCreationStrategy" -- "invaders.entities.Projectile" : uses
+"invaders.entities.Strategies.ShootDownStrategy" -- "invaders.entities.PlayerProjectile" : uses
+"invaders.entities.SpaceBackground" -- "invaders.entities.EntityViewImpl" : uses
+"invaders.entities.SpaceBackground" -- "invaders.engine.GameEngine" : uses
+"invaders.rendering.Renderable" -- "invaders.entities.EntityViewImpl" : uses
+"invaders.entities.Factories.ConcreteEnemyProjectile" -- "invaders.entities.Strategies.EnemyProjectileStrategy" : uses
+"invaders.entities.Factories.ConcretePlayerProjectile" -- "invaders.entities.Factories.ProjectileCreator" : uses
+
+@enduml
