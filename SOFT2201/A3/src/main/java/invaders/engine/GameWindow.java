@@ -3,10 +3,9 @@ package invaders.engine;
 import java.util.List;
 import java.util.ArrayList;
 
-import invaders.ConfigReader;
 import invaders.entities.EntityViewImpl;
 import invaders.entities.SpaceBackground;
-import javafx.scene.control.Alert;
+import invaders.state.GameStateClass;
 import javafx.util.Duration;
 
 import invaders.entities.EntityView;
@@ -15,9 +14,8 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
-import org.json.simple.JSONObject;
 
-public class GameWindow {
+public class GameWindow extends GameStateClass {
 	private final int width;
     private final int height;
 	private Scene scene;

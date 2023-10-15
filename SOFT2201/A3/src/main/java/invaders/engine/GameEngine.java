@@ -32,8 +32,8 @@ public class GameEngine {
 
 	private boolean left;
 	private boolean right;
-	private int gameWidth;
-	private int gameHeight;
+	private final int gameWidth;
+	private final int gameHeight;
 	private int timer = 45;
 
 	public GameEngine(String config){
