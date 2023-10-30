@@ -6,3 +6,5 @@ $(TARGET): $(TARGET).c
 run: $(TARGET)
 	./barber
 
+test: $(TARGET)
+	python3 test.py

@@ -135,7 +135,7 @@ int main(int argc, char **argv) {
   pthread_cond_init(&waiting_all_customers_left_cond, NULL);
 
   threads = malloc(
-      (no_of_customers + 1) *
+      (no_of_customers + no_of_barbers + 1) *
       sizeof(pthread_t)); // total is No_Of_Consuers + 1 to include barber
   if (threads == NULL) {
     fprintf(stderr, "threads out of memory\n");
@@ -179,7 +179,7 @@ int main(int argc, char **argv) {
     barb_infos[k].work_ended = 0;
 
     rc = pthread_create(
-        &threads[k], NULL, barber_routine,
+        &threads[k + no_of_customers + 1], NULL, barber_routine,
         (void *)&barb_infos[k]); // barber routine takes thread id as the arg
 
     if (rc) {
@@ -198,9 +198,12 @@ int main(int argc, char **argv) {
   // create customers according to the arrival rate
   srand(time(0));
   for (k = 1; k < no_of_customers + 1; k++) {
-    sleep(
-        (int)rand() % (customer_rate.max_pace - customer_rate.min_pace) +
-        customer_rate.min_pace); // sleep a few second before creating a thread
+    if (customer_rate.max_pace == customer_rate.min_pace) {
+      sleep(customer_rate.max_pace);
+    } else
+      sleep((int)rand() % (customer_rate.max_pace - customer_rate.min_pace) +
+            customer_rate
+                .min_pace); // sleep a few second before creating a thread
     t_ids[k] = k;
     rc = pthread_create(
         &threads[k], NULL, customer_routine,
@@ -212,12 +215,16 @@ int main(int argc, char **argv) {
   }
 
   // join customer threads.
-  for (k = 1; k < no_of_customers; k++) {
+  for (k = 0; k < no_of_customers + 1; k++) {
+    pthread_join(threads[k], NULL);
+  }
+
+  for (k = no_of_customers + 1; k < no_of_customers + no_of_barbers + 1; k++) {
     pthread_join(threads[k], NULL);
   }
 
   // terminate the barber thread using pthread_cancel().
-  pthread_cancel(threads[0]);
+  /* pthread_cancel(threads[0]); */
 
   // deallocate allocated memory
   free(threads);
@@ -259,9 +266,9 @@ void *assistant_routine(void *arg) {
     pthread_mutex_lock(&customer_mutex);
 
     if (num_customer_visited == no_of_customers && no_of_chairs_occupied == 0) {
-      printf("Assistant: Waiting for barbers to complete cuts\n");
+      printf("Assistant: Waiting for barbers to complete cuts.\n");
       pthread_cond_wait(&waiting_all_customers_left_cond, &customer_mutex);
-      printf("Assistant: Hi Barber, we’ve finished the work for the day.\n");
+      printf("Assistant: Hi Barbers, we’ve finished the work for the day.\n");
       pthread_mutex_unlock(&customer_mutex);
       for (int i = 0; i < no_of_barbers && barber_found == 0; i++) {
         pthread_mutex_lock(&barb_infos[i].barber_n_mutex);
@@ -315,7 +322,8 @@ void *assistant_routine(void *arg) {
              ticket_to_be_called);
 
       ticket_already_called = 0;
-      printf("Assistant: Waiting on Customer %d\n", ticket_to_be_called);
+      printf("Assistant: Waiting on Customer with ticket %d.\n",
+             ticket_to_be_called);
 
       pthread_cond_broadcast(&waiting_on_assistant_cond);
       pthread_cond_wait(&confirm_customer_cond, &customer_mutex);
@@ -361,12 +369,16 @@ void *barber_routine(void *arg) {
       break;
     }
 
-    printf("Barber [%d]: Hello, customer with ticket number %d\n",
+    printf("Barber [%d]: Hello, customer with ticket number %d.\n",
            barber_n_info->barber_id, barber_n_info->customer_ticket_no);
 
     // Cut hair for customer
-    sleep(((int)rand() % (barbers_pace.max_pace - barbers_pace.min_pace)) +
-          barbers_pace.min_pace);
+    if (barbers_pace.max_pace == barbers_pace.min_pace) {
+      sleep(barbers_pace.max_pace);
+
+    } else
+      sleep(((int)rand() % (barbers_pace.max_pace - barbers_pace.min_pace)) +
+            barbers_pace.min_pace);
 
     printf("Barber [%d]: Finished cutting. Good bye, customer %d.\n",
            barber_n_info->barber_id, barber_n_info->customer_ticket_no);
@@ -413,7 +425,7 @@ void *customer_routine(void *arg) {
     int my_ticket = new_ticket_no;
 
     printf("Customer [%d]: I'm lucky to get a free seat and a ticket numbered "
-           "%d\n",
+           "%d.\n",
            *customer_number, my_ticket);
 
     no_of_chairs_occupied++;
@@ -442,17 +454,24 @@ void *customer_routine(void *arg) {
     no_of_chairs_occupied--;
     my_barber_info = new_barber_info;
 
-    printf("Customer [%d]: Confirming with assistant for ticket number %d\n",
+    pthread_mutex_unlock(&customer_mutex);
+    pthread_mutex_lock(&my_barber_info->barber_n_mutex);
+
+    my_barber_info->customer_id_no = *customer_number;
+
+    pthread_mutex_unlock(&my_barber_info->barber_n_mutex);
+    pthread_mutex_lock(&customer_mutex);
+
+    printf("Customer [%d]: Confirming with assistant for ticket number %d.\n",
            *customer_number, last_ticket_called);
     pthread_cond_signal(&confirm_customer_cond);
+
+    pthread_mutex_unlock(&customer_mutex);
+    pthread_mutex_lock(&my_barber_info->barber_n_mutex);
 
     printf("Customer [%d]: My ticket number %d has been called. Hello, Barber "
            "[%d].\n",
            *customer_number, my_ticket, my_barber_info->barber_id);
-
-    pthread_mutex_unlock(&customer_mutex);
-
-    pthread_mutex_lock(&my_barber_info->barber_n_mutex);
 
     // // -- wait for barber to finish cutting hair
     pthread_cond_wait(&my_barber_info->being_served_cond,
