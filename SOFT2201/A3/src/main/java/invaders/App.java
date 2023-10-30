@@ -1,5 +1,6 @@
 package invaders;
 
+import invaders.singleton.DifficultyConfigReader;
 import invaders.state.GameStateClass;
 import invaders.state.MenuScreen;
 import javafx.application.Application;
@@ -31,55 +32,15 @@ public class App extends Application {
     }
 
     public App() {
-        this.model = new GameEngine("src/main/resources/config_easy.json");
-        this.window = new GameWindow(model);
+        this.model = new GameEngine();
         this.gameStates = new ArrayList<>();
-        MenuScreen ms = new MenuScreen();
-
-        GridPane grid = new GridPane();
-        grid.setAlignment(Pos.CENTER);
-        grid.setHgap(10);
-        grid.setVgap(12);
-
-        HBox hbButtons = new HBox();
-        hbButtons.setSpacing(10.0);
-
-        Button btnLv1 = new Button("Level 1");
-        Button btnLv2 = new Button("Level 2");
-        Button btnLv3 = new Button("Level 3");
-        Button btnLv4 = new Button("Level 4");
-
-        EventHandler<ActionEvent> lv1 = new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent e) {
-                nextScene();
-            }
-        };
-        EventHandler<ActionEvent> lv2 = new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent e) {
-            }
-        };
-
-        EventHandler<ActionEvent> lv3 = new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent e) {
-            }
-        };
-
-        EventHandler<ActionEvent> lv4 = new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent e) {
-            }
-        };
-
-        btnLv1.setOnAction(lv1);
-        btnLv2.setOnAction(lv2);
-        btnLv3.setOnAction(lv3);
-        btnLv4.setOnAction(lv4);
-
-        hbButtons.getChildren().addAll(btnLv1, btnLv2, btnLv3, btnLv4);
-        grid.add(hbButtons, 0, 2, 2, 1);
-
-        ms.getRootPane().getChildren().add(grid);
-
+        MenuScreen ms = new MenuScreen(this);
         this.gameStates.add(ms);
+    }
+
+    public void setLevel(DifficultyConfigReader dcr) {
+        model.setDifficulty(dcr);
+        this.window = new GameWindow(model);
         this.gameStates.add(this.window);
     }
 

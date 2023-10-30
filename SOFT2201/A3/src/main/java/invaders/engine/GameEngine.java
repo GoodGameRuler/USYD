@@ -12,7 +12,10 @@ import invaders.gameobject.Bunker;
 import invaders.gameobject.Enemy;
 import invaders.gameobject.GameObject;
 import invaders.entities.Player;
+import invaders.gameobject.ScoreCollectable;
+import invaders.observer.Score;
 import invaders.rendering.Renderable;
+import invaders.singleton.DifficultyConfigReader;
 import org.json.simple.JSONObject;
 
 /**
@@ -27,32 +30,41 @@ public class GameEngine {
 	private List<Renderable> pendingToRemoveRenderable = new ArrayList<>();
 
 	private List<Renderable> renderables =  new ArrayList<>();
+	private List<ScoreCollectable> collectables = new ArrayList<>();
 
 	private Player player;
 
 	private boolean left;
 	private boolean right;
-	private final int gameWidth;
-	private final int gameHeight;
+	private int gameWidth;
+	private int gameHeight;
 	private int timer = 45;
 
-	public GameEngine(String config){
-		// Read the config here
-		ConfigReader.parse(config);
+	public GameEngine(){
 
+	}
+
+	public List<ScoreCollectable> getCollectables() {
+		return this.collectables;
+	}
+
+	public void setDifficulty(DifficultyConfigReader dcr){
 		// Get game width and height
-		gameWidth = ((Long)((JSONObject) ConfigReader.getGameInfo().get("size")).get("x")).intValue();
-		gameHeight = ((Long)((JSONObject) ConfigReader.getGameInfo().get("size")).get("y")).intValue();
+		gameWidth = dcr.getGameWidth();
+		gameHeight = dcr.getGameHeight();
+
+		renderables.clear();
+		gameObjects.clear();
 
 		//Get player info
-		this.player = new Player(ConfigReader.getPlayerInfo());
+		this.player = new Player(dcr.getPlayerInfo());
 		renderables.add(player);
 
 
 		Director director = new Director();
 		BunkerBuilder bunkerBuilder = new BunkerBuilder();
 		//Get Bunkers info
-		for(Object eachBunkerInfo:ConfigReader.getBunkersInfo()){
+		for(Object eachBunkerInfo : dcr.getBunkerInfo()){
 			Bunker bunker = director.constructBunker(bunkerBuilder, (JSONObject) eachBunkerInfo);
 			gameObjects.add(bunker);
 			renderables.add(bunker);
@@ -61,12 +73,12 @@ public class GameEngine {
 
 		EnemyBuilder enemyBuilder = new EnemyBuilder();
 		//Get Enemy info
-		for(Object eachEnemyInfo:ConfigReader.getEnemiesInfo()){
+		for(Object eachEnemyInfo: dcr.getEnemiesInfo()){
 			Enemy enemy = director.constructEnemy(this,enemyBuilder,(JSONObject)eachEnemyInfo);
+			this.collectables.add(enemy);
 			gameObjects.add(enemy);
 			renderables.add(enemy);
 		}
-
 	}
 
 	/**

@@ -1,7 +1,6 @@
 package invaders.factory;
 
 import invaders.engine.GameEngine;
-import invaders.physics.Collider;
 import invaders.physics.Vector2D;
 import invaders.strategy.ProjectileStrategy;
 import javafx.scene.image.Image;
@@ -19,6 +18,7 @@ public class EnemyProjectile extends Projectile{
         strategy.update(this);
 
         if(this.getPosition().getY()>= model.getGameHeight() - this.getImage().getHeight()){
+            this.setDestroyed();
             this.takeDamage(1);
         }
 
@@ -26,5 +26,10 @@ public class EnemyProjectile extends Projectile{
     @Override
     public String getRenderableObjectName() {
         return "EnemyProjectile";
+    }
+
+    @Override
+    public int getScore() {
+        return this.strategy.projectilePoints();
     }
 }

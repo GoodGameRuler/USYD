@@ -4,6 +4,7 @@ import invaders.engine.GameEngine;
 import invaders.factory.EnemyProjectileFactory;
 import invaders.factory.Projectile;
 import invaders.factory.ProjectileFactory;
+import invaders.observer.Score;
 import invaders.physics.Collider;
 import invaders.physics.Vector2D;
 import invaders.rendering.Renderable;
@@ -14,7 +15,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class Enemy implements GameObject, Renderable {
+public class Enemy implements GameObject, Renderable, ScoreCollectable {
     private Vector2D position;
     private int lives = 1;
     private Image image;
@@ -26,6 +27,7 @@ public class Enemy implements GameObject, Renderable {
     private ProjectileFactory projectileFactory;
     private Image projectileImage;
     private Random random = new Random();
+    private Score scoreCollector;
 
     public Enemy(Vector2D position) {
         this.position = position;
@@ -42,6 +44,7 @@ public class Enemy implements GameObject, Renderable {
         if(enemyProjectile.size()<3){
             if(this.isAlive() &&  random.nextInt(120)==20){
                 Projectile p = projectileFactory.createProjectile(new Vector2D(position.getX() + this.image.getWidth() / 2, position.getY() + image.getHeight() + 2),projectileStrategy, projectileImage);
+                p.setScoreCollector(this.scoreCollector);
                 enemyProjectile.add(p);
                 engine.getPendingToAddGameObject().add(p);
                 engine.getPendingToAddRenderable().add(p);
@@ -122,6 +125,10 @@ public class Enemy implements GameObject, Renderable {
     @Override
     public void takeDamage(double amount) {
         this.lives-=1;
+        if(this.lives <= 0) {
+            this.incrementCollector();
+            this.scoreCollector.informObservers();
+        }
     }
 
     @Override
@@ -143,4 +150,20 @@ public class Enemy implements GameObject, Renderable {
         this.projectileStrategy = projectileStrategy;
     }
 
+    @Override
+    public void setScoreCollector(Score score) {
+        this.scoreCollector = score;
+
+    }
+
+    @Override
+    public void incrementCollector() {
+        this.scoreCollector.incrementScore(this.getScore());
+
+    }
+
+    @Override
+    public int getScore() {
+        return this.projectileStrategy.creatingEntityPoints();
+    }
 }

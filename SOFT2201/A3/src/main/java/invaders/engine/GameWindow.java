@@ -5,7 +5,15 @@ import java.util.ArrayList;
 
 import invaders.entities.EntityViewImpl;
 import invaders.entities.SpaceBackground;
+import invaders.gameobject.ScoreCollectable;
+import invaders.observer.ScoreObserver;
+import invaders.observer.Timer;
+import invaders.observer.Score;
+import invaders.observer.TimerObserver;
 import invaders.state.GameStateClass;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import javafx.util.Duration;
 
 import invaders.entities.EntityView;
@@ -23,6 +31,8 @@ public class GameWindow extends GameStateClass {
     private GameEngine model;
     private List<EntityView> entityViews =  new ArrayList<EntityView>();
     private Renderable background;
+    private Timer timer = new Timer();
+    private Score score = new Score();
 
     private double xViewportOffset = 0.0;
     private double yViewportOffset = 0.0;
@@ -42,6 +52,23 @@ public class GameWindow extends GameStateClass {
         scene.setOnKeyPressed(keyboardInputHandler::handlePressed);
         scene.setOnKeyReleased(keyboardInputHandler::handleReleased);
 
+
+        ScoreObserver so = new ScoreObserver(this.score);
+        TimerObserver to = new TimerObserver(this.timer);
+
+        timer.attach(to);
+        score.attach(so);
+
+        for (ScoreCollectable sc : model.getCollectables()) {
+            sc.setScoreCollector(this.score);
+        }
+
+        HBox hb = new HBox();
+        hb.setSpacing(20);
+        hb.setAlignment(Pos.TOP_CENTER);
+        hb.getChildren().addAll(so.getLabel(), to.getLabel());
+        pane.getChildren().add(hb);
+
     }
 
 	public void run() {
@@ -54,6 +81,9 @@ public class GameWindow extends GameStateClass {
 
     private void draw(){
         model.update();
+
+        timer.incrementTime();
+        timer.informObservers();
 
         List<Renderable> renderables = model.getRenderables();
         for (Renderable entity : renderables) {
