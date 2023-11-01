@@ -28,4 +28,6 @@ public abstract class GameStateClass {
     public void run() {
         return;
     }
+
+    public abstract void stop();
 }

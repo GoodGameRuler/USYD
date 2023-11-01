@@ -27,6 +27,8 @@ public class Player implements Moveable, Renderable {
     private final Image image;
     private ProjectileFactory playerProjectileFactory = new PlayerProjectileFactory();
 
+    private JSONObject playerInfo;
+
 
     public Player(JSONObject playerInfo){
         int x = ((Long)((JSONObject)(playerInfo.get("position"))).get("x")).intValue();
@@ -36,7 +38,13 @@ public class Player implements Moveable, Renderable {
         this.position = new Vector2D(x,y);
         this.health = ((Long) playerInfo.get("lives")).intValue();
         this.velocity = ((Long) playerInfo.get("speed")).intValue();
+    }
 
+    private Player(Image image, Vector2D position, Double health, Double velocity) {
+        this.image = image;
+        this.position = position;
+        this.health = health;
+        this.velocity = velocity;
     }
 
     @Override
@@ -106,6 +114,11 @@ public class Player implements Moveable, Renderable {
     @Override
     public String getRenderableObjectName() {
         return "Player";
+    }
+
+    @Override
+    public Player clone() {
+        return new Player(this.image, this.position.clone(), this.health, this.velocity);
     }
 
 }

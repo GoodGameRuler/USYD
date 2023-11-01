@@ -6,12 +6,19 @@ import java.util.ArrayList;
 import invaders.entities.EntityViewImpl;
 import invaders.entities.SpaceBackground;
 import invaders.gameobject.ScoreCollectable;
+import invaders.memento.GameCareTaker;
+import invaders.memento.GameMemento;
 import invaders.observer.ScoreObserver;
 import invaders.observer.Timer;
 import invaders.observer.Score;
 import invaders.observer.TimerObserver;
+import invaders.singleton.Level3ConfigReader;
+import invaders.singleton.Level4ConfigReader;
 import invaders.state.GameStateClass;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.util.Duration;
@@ -23,7 +30,7 @@ import javafx.animation.Timeline;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 
-public class GameWindow extends GameStateClass {
+public class GameWindow extends GameStateClass implements GameCareTaker {
 	private final int width;
     private final int height;
 	private Scene scene;
@@ -36,7 +43,9 @@ public class GameWindow extends GameStateClass {
 
     private double xViewportOffset = 0.0;
     private double yViewportOffset = 0.0;
+    private Timeline timeline;
     // private static final double VIEWPORT_MARGIN = 280.0;
+    private GameMemento prevCheckpoint = null;
 
 	public GameWindow(GameEngine model){
         this.model = model;
@@ -63,19 +72,49 @@ public class GameWindow extends GameStateClass {
             sc.setScoreCollector(this.score);
         }
 
+
         HBox hb = new HBox();
         hb.setSpacing(20);
         hb.setAlignment(Pos.TOP_CENTER);
-        hb.getChildren().addAll(so.getLabel(), to.getLabel());
+
+        Button save = new Button("Save");
+        Button undo = new Button("Undo");
+        Button cheat = new Button("Cheat");
+
+        save.setFocusTraversable(false);
+        cheat.setFocusTraversable(false);
+        undo.setFocusTraversable(false);
+
+        EventHandler<ActionEvent> saveEvent = new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e) {
+                save();
+            }
+        };
+
+        EventHandler<ActionEvent> undoEvent = new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e) {
+                undo();
+            }
+        };
+
+        save.setOnAction(saveEvent);
+        undo.setOnAction(undoEvent);
+
+        hb.getChildren().addAll(so.getLabel(), to.getLabel(), save, undo, cheat);
         pane.getChildren().add(hb);
 
     }
 
 	public void run() {
-         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(17), t -> this.draw()));
+         this.timeline = new Timeline(new KeyFrame(Duration.millis(17), t -> this.draw()));
 
          timeline.setCycleCount(Timeline.INDEFINITE);
          timeline.play();
+    }
+
+    @Override
+    public void stop() {
+        this.timeline.stop();
     }
 
 
@@ -109,6 +148,10 @@ public class GameWindow extends GameStateClass {
                         entityView.markForDelete();
                     }
                 }
+
+                // Also remove dead objects if not already to remove
+                if(!model.getPendingToRemoveRenderable().contains(entity))
+                    model.getPendingToRemoveRenderable().add(entity);
             }
         }
 
@@ -135,5 +178,19 @@ public class GameWindow extends GameStateClass {
 
 	public Scene getScene() {
         return scene;
+    }
+
+    @Override
+    public void undo() {
+        if(this.prevCheckpoint != null) {
+            this.prevCheckpoint.undo();
+            this.prevCheckpoint = null;
+        }
+    }
+
+    @Override
+    public void save() {
+        this.prevCheckpoint = this.model.save();
+
     }
 }

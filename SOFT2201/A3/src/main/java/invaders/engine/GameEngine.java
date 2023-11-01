@@ -3,6 +3,7 @@ package invaders.engine;
 import java.util.ArrayList;
 import java.util.List;
 
+import invaders.App;
 import invaders.ConfigReader;
 import invaders.builder.BunkerBuilder;
 import invaders.builder.Director;
@@ -13,15 +14,21 @@ import invaders.gameobject.Enemy;
 import invaders.gameobject.GameObject;
 import invaders.entities.Player;
 import invaders.gameobject.ScoreCollectable;
+import invaders.memento.BasicGameMemento;
+import invaders.memento.GameMemento;
+import invaders.memento.GameOriginator;
 import invaders.observer.Score;
 import invaders.rendering.Renderable;
 import invaders.singleton.DifficultyConfigReader;
+import invaders.state.GameStateClass;
+import invaders.state.LoseScreen;
+import invaders.state.WinScreen;
 import org.json.simple.JSONObject;
 
 /**
  * This class manages the main loop and logic of the game
  */
-public class GameEngine {
+public class GameEngine implements GameOriginator {
 	private List<GameObject> gameObjects = new ArrayList<>(); // A list of game objects that gets updated each frame
 	private List<GameObject> pendingToAddGameObject = new ArrayList<>();
 	private List<GameObject> pendingToRemoveGameObject = new ArrayList<>();
@@ -39,6 +46,7 @@ public class GameEngine {
 	private int gameWidth;
 	private int gameHeight;
 	private int timer = 45;
+	private App app;
 
 	public GameEngine(){
 
@@ -81,6 +89,15 @@ public class GameEngine {
 		}
 	}
 
+	public void setApp(App app) {
+		this.app = app;
+	}
+
+	public void changeGameState(GameStateClass gs) {
+		this.app.setGameState(gs);
+	}
+
+
 	/**
 	 * Updates the game/simulation
 	 */
@@ -88,6 +105,24 @@ public class GameEngine {
 		timer+=1;
 
 		movePlayer();
+
+		boolean foundEnemy = false;
+
+		for(Renderable rend : renderables) {
+			if(rend.getRenderableObjectName().equals("Enemy") && rend.isAlive()) {
+				foundEnemy = true;				
+			}
+		}
+		
+		if(!foundEnemy) {
+			this.changeGameState(new WinScreen(this.app));
+			return;
+			
+		} else if (!player.isAlive()) {
+			this.changeGameState(new LoseScreen(this.app));
+			return;
+		}
+
 
 		for(GameObject go: gameObjects){
 			go.update(this);
@@ -103,6 +138,15 @@ public class GameEngine {
 						(renderableA.getRenderableObjectName().equals("EnemyProjectile") && renderableB.getRenderableObjectName().equals("EnemyProjectile"))){
 				}else{
 					if(renderableA.isColliding(renderableB) && (renderableA.getHealth()>0 && renderableB.getHealth()>0)) {
+
+						if(renderableA.getRenderableObjectName().equals("EnemyProjectile") && !renderableB.getRenderableObjectName().equals("PlayerProjectile")) {
+							((Projectile) renderableA).setDestroyed();
+
+						} else if(renderableB.getRenderableObjectName().equals("EnemyProjectile") && !renderableA.getRenderableObjectName().equals("PlayerProjectile")) {
+							((Projectile) renderableB).setDestroyed();
+
+						}
+
 						renderableA.takeDamage(1);
 						renderableB.takeDamage(1);
 					}
@@ -206,5 +250,38 @@ public class GameEngine {
 
 	public Player getPlayer() {
 		return player;
+	}
+
+	@Override
+	public GameMemento save() {
+		BasicGameMemento gameMemento = new BasicGameMemento(this);
+		gameMemento.setLeft(left);
+		gameMemento.setRight(right);
+		gameMemento.setPlayer(player);
+		return gameMemento;
+	}
+
+	@Override
+	public void setPlayer(Player player) {
+		renderables.add(player);
+		this.player.takeDamage(this.player.getHealth());
+		this.player.isAlive();
+		this.player = player;
+	}
+
+	@Override
+	public void setLeft(Boolean left) {
+		this.left = left;
+
+	}
+
+	@Override
+	public void setRight(Boolean right) {
+		this.right = right;
+
+	}
+
+	public void setEngineState(GameMemento gm) {
+
 	}
 }

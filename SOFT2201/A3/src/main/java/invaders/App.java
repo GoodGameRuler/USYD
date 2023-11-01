@@ -33,6 +33,7 @@ public class App extends Application {
 
     public App() {
         this.model = new GameEngine();
+        this.model.setApp(this);
         this.gameStates = new ArrayList<>();
         MenuScreen ms = new MenuScreen(this);
         this.gameStates.add(ms);
@@ -58,6 +59,7 @@ public class App extends Application {
     }
 
     public void setGameState(GameStateClass gs) {
+        currentGameState.stop();
         currentGameState = gs;
         currentGameState.run();
         this.primaryStage.setScene(gs.getScene());

@@ -94,4 +94,9 @@ public class MenuScreen extends GameStateClass {
         pane.getChildren().add(grid);
 
     }
+
+    @Override
+    public void stop() {
+
+    }
 }
