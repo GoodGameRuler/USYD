@@ -31,4 +31,12 @@ public class PlayerProjectile extends Projectile {
     public int getScore() {
         return this.strategy.projectilePoints();
     }
+
+    @Override
+    public PlayerProjectile clone() {
+        PlayerProjectile pp = new PlayerProjectile(this.getPosition().clone(), strategy);
+        pp.setHealth((int) this.getHealth());
+        pp.setDestroyed(this.getDestroyed());
+        return pp;
+    }
 }

@@ -1,18 +1,18 @@
 package invaders.gameobject;
 
 import invaders.engine.GameEngine;
+import invaders.factory.EnemyProjectile;
 import invaders.factory.EnemyProjectileFactory;
 import invaders.factory.Projectile;
 import invaders.factory.ProjectileFactory;
 import invaders.observer.Score;
-import invaders.physics.Collider;
 import invaders.physics.Vector2D;
 import invaders.rendering.Renderable;
 import invaders.strategy.ProjectileStrategy;
 import javafx.scene.image.Image;
 
-import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class Enemy implements GameObject, Renderable, ScoreCollectable {
@@ -162,6 +162,35 @@ public class Enemy implements GameObject, Renderable, ScoreCollectable {
 
     }
 
+    @Override
+    public Enemy clone() {
+        Enemy newEnemy = new Enemy(position.clone());
+
+        newEnemy.setImage(image);
+        newEnemy.setScoreCollector(scoreCollector);
+        newEnemy.setLives(lives);
+        newEnemy.setProjectileStrategy(projectileStrategy);
+        newEnemy.setProjectileImage(projectileImage);
+        newEnemy.setEnemyProjectileFactory(projectileFactory);
+        newEnemy.setXVel(xVel);
+        return newEnemy;
+    }
+
+    protected void setXVel(int xVel) {
+        this.xVel = xVel;
+    }
+
+    protected void setEnemyProjectileFactory(ProjectileFactory projectileFactory) {
+        this.projectileFactory = projectileFactory;
+    }
+
+    public List<Projectile> getEnemyProjectile() {
+        return this.enemyProjectile;
+    }
+
+    public List<Projectile> getPendingToDeleteProjectiles() {
+        return this.pendingToDeleteEnemyProjectile;
+    }
     @Override
     public int getScore() {
         return this.projectileStrategy.creatingEntityPoints();

@@ -23,6 +23,14 @@ public abstract class Projectile implements Renderable, GameObject, ScoreCollect
         this.destroyed = false;
     }
 
+    public boolean getDestroyed() {
+        return this.destroyed;
+    }
+
+    public void setDestroyed(boolean destroyed) {
+        this.destroyed = destroyed;
+    }
+
     @Override
     public Vector2D getPosition() {
         return position;
@@ -63,6 +71,10 @@ public abstract class Projectile implements Renderable, GameObject, ScoreCollect
     @Override
     public double getHealth() {
         return this.lives;
+    }
+
+    public void setHealth(int health) {
+        this.lives = health;
     }
 
     @Override

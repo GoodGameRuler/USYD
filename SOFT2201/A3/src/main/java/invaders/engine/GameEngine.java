@@ -18,6 +18,7 @@ import invaders.memento.BasicGameMemento;
 import invaders.memento.GameMemento;
 import invaders.memento.GameOriginator;
 import invaders.observer.Score;
+import invaders.observer.Timer;
 import invaders.rendering.Renderable;
 import invaders.singleton.DifficultyConfigReader;
 import invaders.state.GameStateClass;
@@ -38,6 +39,8 @@ public class GameEngine implements GameOriginator {
 
 	private List<Renderable> renderables =  new ArrayList<>();
 	private List<ScoreCollectable> collectables = new ArrayList<>();
+	private Timer clock = new Timer();
+	private Score score = new Score();
 
 	private Player player;
 
@@ -50,6 +53,14 @@ public class GameEngine implements GameOriginator {
 
 	public GameEngine(){
 
+	}
+
+	public Timer getTimer() {
+		return this.clock;
+	}
+
+	public Score getScore() {
+		return this.score;
 	}
 
 	public List<ScoreCollectable> getCollectables() {
@@ -258,7 +269,20 @@ public class GameEngine implements GameOriginator {
 		gameMemento.setLeft(left);
 		gameMemento.setRight(right);
 		gameMemento.setPlayer(player);
+		gameMemento.setTimer(clock);
+		gameMemento.setScore(score);
+		gameMemento.setGameObjects(renderables, gameObjects);
 		return gameMemento;
+	}
+
+	public void setGameObjects(List<Renderable> renderables, List<GameObject> gameObjects) {
+		for(Renderable rend : this.renderables) {
+			if(!rend.equals(player)) {
+				rend.takeDamage(rend.getHealth());
+			}
+		}
+		this.renderables.addAll(renderables);
+		this.gameObjects.addAll(gameObjects);
 	}
 
 	@Override
@@ -279,6 +303,18 @@ public class GameEngine implements GameOriginator {
 	public void setRight(Boolean right) {
 		this.right = right;
 
+	}
+
+	@Override
+	public void setScore(int score) {
+		this.score.setScore(score);
+		this.score.informObservers();
+	}
+
+	@Override
+	public void setTimer(int frames) {
+		this.clock.setFrames(frames);
+		this.clock.informObservers();
 	}
 
 	public void setEngineState(GameMemento gm) {

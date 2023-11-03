@@ -38,8 +38,6 @@ public class GameWindow extends GameStateClass implements GameCareTaker {
     private GameEngine model;
     private List<EntityView> entityViews =  new ArrayList<EntityView>();
     private Renderable background;
-    private Timer timer = new Timer();
-    private Score score = new Score();
 
     private double xViewportOffset = 0.0;
     private double yViewportOffset = 0.0;
@@ -62,14 +60,14 @@ public class GameWindow extends GameStateClass implements GameCareTaker {
         scene.setOnKeyReleased(keyboardInputHandler::handleReleased);
 
 
-        ScoreObserver so = new ScoreObserver(this.score);
-        TimerObserver to = new TimerObserver(this.timer);
+        ScoreObserver so = new ScoreObserver(model.getScore());
+        TimerObserver to = new TimerObserver(model.getTimer());
 
-        timer.attach(to);
-        score.attach(so);
+        model.getTimer().attach(to);
+        model.getScore().attach(so);
 
         for (ScoreCollectable sc : model.getCollectables()) {
-            sc.setScoreCollector(this.score);
+            sc.setScoreCollector(model.getScore());
         }
 
 
@@ -121,8 +119,8 @@ public class GameWindow extends GameStateClass implements GameCareTaker {
     private void draw(){
         model.update();
 
-        timer.incrementTime();
-        timer.informObservers();
+        model.getTimer().incrementTime();
+        model.getTimer().informObservers();
 
         List<Renderable> renderables = model.getRenderables();
         for (Renderable entity : renderables) {
