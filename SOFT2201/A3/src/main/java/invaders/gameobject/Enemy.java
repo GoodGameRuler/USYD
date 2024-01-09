@@ -1,7 +1,6 @@
 package invaders.gameobject;
 
 import invaders.engine.GameEngine;
-import invaders.factory.EnemyProjectile;
 import invaders.factory.EnemyProjectileFactory;
 import invaders.factory.Projectile;
 import invaders.factory.ProjectileFactory;

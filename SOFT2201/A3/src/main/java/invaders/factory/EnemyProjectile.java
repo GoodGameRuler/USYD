@@ -32,4 +32,12 @@ public class EnemyProjectile extends Projectile{
     public int getScore() {
         return this.strategy.projectilePoints();
     }
+
+    @Override
+    public EnemyProjectile clone() {
+        EnemyProjectile ep = new EnemyProjectile(this.getPosition().clone(), strategy, getImage());
+        ep.setDestroyed(this.getDestroyed());
+        ep.setHealth((int) this.getHealth());
+        return ep;
+    }
 }

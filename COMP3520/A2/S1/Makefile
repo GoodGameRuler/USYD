@@ -19,9 +19,9 @@ $(PROCESS): $(SRC)/sigtrap.c
 	gcc -o $(PROCESS) $^
 
 rand: random
-	./random rand.txt
+	./$(OUT)/random $(RESOURCES)/rand.txt
 
-random: random.c
+random: $(SRC)/random.c
 	gcc -o $(OUT)/$@ $^ -lm $(LIB)
 
 $(TARGET): $(SRC)/$(TARGET).c $(DEPENDENCIES)
@@ -32,6 +32,10 @@ debug: $(TARGET)
 
 batch_debug: $(TARGET)
 	gdb -x $(DEBUG_DIR)/basic.txt --batch --args $(TARGET) $(RESOURCES)/rand.txt
+
+clean:
+	rm dispatch
+	rm $(OUT)/*
 
 
 

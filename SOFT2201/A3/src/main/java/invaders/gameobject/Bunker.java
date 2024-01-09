@@ -106,4 +106,16 @@ public class Bunker implements GameObject, Renderable {
     public void setState(BunkerState state) {
         this.state = state;
     }
+
+    public Bunker clone() {
+        Bunker bunkerClone = new Bunker();
+        bunkerClone.setHeight((int) height);
+        bunkerClone.setImage(image);
+        bunkerClone.setLives(lives);
+        bunkerClone.setPosition(position.clone());
+        bunkerClone.setWidth((int) width);
+        bunkerClone.setState(state);
+
+        return bunkerClone;
+    }
 }

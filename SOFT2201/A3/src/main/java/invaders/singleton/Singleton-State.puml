@@ -1,27 +1,96 @@
 @startuml
-'https://plantuml.com/class-diagram
 
-abstract class AbstractList
-abstract AbstractCollection
-interface List
-interface Collection
+skinparam linetype ortho
 
-List <|-- AbstractList
-Collection <|-- AbstractCollection
+package invaders.singleton {
+    abstract class DifficultyConfigReader <<abstract>> {
+        - level: int
+        - gameWidth: int
+        - gameHeight: int
+        - bunkerInfo: JSONArray
+        - enemiesInfo: JSONArray
+        - playerInfo: JSONObject
+        - config: String
+        - start(): void
+        + getLevel(): int
+        + getGameWidth(): int
+        + getGameHeight(): int
+        + getBunkerInfo(): JSONArray
+        + getEnemiesInfo(): JSONArray
+        + getPlayerInfo(): JSONObject
+    }
 
-Collection <|- List
-AbstractCollection <|- AbstractList
-AbstractList <|-- ArrayList
+    class Level1ConfigReader {
+        - instance: Level1ConfigReader
+        - config: String
+        + getInstance(): Level1ConfigReader
+    }
 
-class ArrayList {
-Object[] elementData
-size()
+    class Level2ConfigReader {
+        - instance: Level2ConfigReader
+        - config: String
+        + getInstance(): Level2ConfigReader
+    }
+
+    class Level3ConfigReader {
+        - instance: Level3ConfigReader
+        - config: String
+        + getInstance(): Level3ConfigReader
+    }
+
+    class Level4ConfigReader {
+        - instance: Level4ConfigReader
+        - config: String
+        + getInstance(): Level4ConfigReader
+    }
 }
 
-enum TimeUnit {
-DAYS
-HOURS
-MINUTES
+package invaders.state {
+    class GameStateClass {
+        - width: int
+        - height: int
+        - scene: Scene
+        - pane: Pane
+        + GameStateClass()
+        + getScene(): Scene
+        + getRootPane(): Pane
+        + run(): void
+        {abstract} + stop(): void
+    }
+
+    class WinScreen {
+        + WinScreen(app: App)
+        {abstract} + stop(): void
+    }
+
+    class LoseScreen {
+        + LoseScreen(app: App)
+        {abstract} + stop(): void
+    }
 }
+    class App {
+        - primaryStage: Stage
+        - model: GameEngine
+        - window: GameWindow
+        - currentGameState: GameStateClass
+        - gameStates: ArrayList<GameStateClass>
+        + main(args: String[]): void
+        + App()
+        + setLevel(dcr: DifficultyConfigReader): void
+        + start(primaryStage: Stage): void
+        + setGameState(gs: GameStateClass): void
+        + nextScene(): void
+    }
+DifficultyConfigReader <|-- Level1ConfigReader
+DifficultyConfigReader <|-- Level2ConfigReader
+DifficultyConfigReader <|-- Level3ConfigReader
+DifficultyConfigReader <|-- Level4ConfigReader
+GameStateClass <|-- WinScreen
+GameStateClass <|-- LoseScreen
+GameStateClass <|-- LoseScreen
+GameStateClass <|-- GameWindow
+GameEngine --> DifficultyConfigReader
+App --> GameStateClass
+GameWindow --> GameEngine
 
 @enduml

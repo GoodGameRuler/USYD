@@ -3,6 +3,8 @@ package invaders.memento;
 import invaders.entities.Player;
 import invaders.factory.EnemyProjectile;
 import invaders.factory.PlayerProjectile;
+import invaders.factory.Projectile;
+import invaders.gameobject.Bunker;
 import invaders.gameobject.Enemy;
 import invaders.gameobject.GameObject;
 import invaders.gameobject.ScoreCollectable;
@@ -86,19 +88,20 @@ public class BasicGameMemento implements GameMemento {
 
         for(Renderable enemy : enemies) {
             Enemy castEnemy = (Enemy) enemy;
-
             Enemy enemyClone = castEnemy.clone();
+            enemyClone.getEnemyProjectile().addAll(castEnemy.getEnemyProjectile().stream().map(ep -> (Projectile) ((EnemyProjectile) ep).clone()).toList());
+            enemyClone.getPendingToDeleteProjectiles().addAll(castEnemy.getPendingToDeleteProjectiles().stream().map(ep -> (Projectile) ((EnemyProjectile) ep).clone()).toList());
 
             this.renderables.add(enemyClone);
             this.gameObjects.add(enemyClone);
         }
 
-        for(Renderable enemyProjectile : enemyProjectiles) {
-            EnemyProjectile castEnemyProjectile = (EnemyProjectile) enemyProjectile;
-            PlayerProjectile projectileClone = castEnemyProjectile.clone();
+        for(Renderable bunker : Bunkers) {
+            Bunker castBunker = (Bunker) bunker;
+            Bunker bunkerClone = castBunker.clone();
 
-            this.renderables.add(projectileClone);
-            this.gameObjects.add(projectileClone);
+            this.renderables.add(bunkerClone);
+            this.gameObjects.add(bunkerClone);
         }
 
         for(Renderable playerProjectile : playerProjectiles) {

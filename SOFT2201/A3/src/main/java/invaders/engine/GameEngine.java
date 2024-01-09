@@ -279,6 +279,13 @@ public class GameEngine implements GameOriginator {
 		for(Renderable rend : this.renderables) {
 			if(!rend.equals(player)) {
 				rend.takeDamage(rend.getHealth());
+
+				if(rend.getRenderableObjectName().equals("Enemy")) {
+					Enemy enemy = (Enemy) rend;
+					enemy.getEnemyProjectile().forEach(ep -> {
+						ep.takeDamage(ep.getHealth());
+					});
+				}
 			}
 		}
 		this.renderables.addAll(renderables);

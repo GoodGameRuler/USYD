@@ -1,0 +1,20 @@
+---
+title: "Week 2 Lab"
+output: pdf_document
+date: "2023-10-31"
+---
+
+## Q1
+```{r q1}
+## Part A
+x <- rbinom(1000, 200, 0.3)
+hist(x, prob = TRUE)
+x_mean<-200*0.3
+x_sd<-sqrt(200*0.3*0.7)
+curve(dnorm(x, mean=x_mean, sd=x_sd), xlim=c(0,200), add=T)
+
+## Part B
+pbinom(55,200,0.3)-pbinom(44,200,0.3)
+sum(dbinom(45:55,200,0.3))
+```
+

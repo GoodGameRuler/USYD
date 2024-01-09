@@ -1,0 +1,1 @@
+Please run using ./gradlew settup to the right version 7.4.2

@@ -1,27 +1,649 @@
 @startuml
-'https://plantuml.com/class-diagram
 
-abstract class AbstractList
-abstract AbstractCollection
-interface List
-interface Collection
+title Class Diagram for "Invaders Game"
 
-List <|-- AbstractList
-Collection <|-- AbstractCollection
+skinparam linetype ortho
 
-Collection <|- List
-AbstractCollection <|- AbstractList
-AbstractList <|-- ArrayList
-
-class ArrayList {
-Object[] elementData
-size()
+package invaders.builder {
+    abstract class Builder <<abstract>> {
+        +//buildPosition(Vector2D position)//
+        +//buildLives(int live)//
+        +//createGameObject()//
+        +//reset()//
+    }
+    class BunkerBuilder {
+        + buildImage(Image image)
+    }
+    class Director {
+        + constructBunker(BunkerBuilder builder, JSONObject eachBunkerInfo)
+        + constructEnemy(GameEngine engine, EnemyBuilder builder, JSONObject eachEnemyInfo)
+    }
+    class EnemyBuilder {
+        + buildImageAndStrategy(String strategy)
+    }
 }
 
-enum TimeUnit {
-DAYS
-HOURS
-MINUTES
+Builder <|--- BunkerBuilder
+Builder <|--- EnemyBuilder
+
+Director --> invaders.gameobject.Enemy: creates
+Director --> invaders.gameobject.Bunker: creates
+
+Director --> BunkerBuilder
+Director --> EnemyBuilder
+
+package invaders.strategy {
+    interface ProjectileStrategy {
+        +update(p: Projectile)
+    }
+
+    ProjectileStrategy <|-- FastProjectileStrategy
+    ProjectileStrategy <|-- SlowProjectileStrategy
+    ProjectileStrategy <|-- NormalProjectileStrategy
+
+    class FastProjectileStrategy {
+        +update(p: Projectile)
+    }
+
+    class NormalProjectileStrategy {
+        +update(p: Projectile)
+    }
+
+    class SlowProjectileStrategy {
+        +update(p: Projectile)
+    }
 }
+
+
+package invaders.factory {
+    class Projectile {
+        + getPosition(): Vector2D
+        + getImage(): Image
+        + getLayer(): Layer
+        + start()
+        + getWidth(): double
+        + getHeight(): double
+        + takeDamage(amount: double)
+        + getHealth(): double
+        + isAlive(): boolean
+    }
+
+    class EnemyProjectile {
+        - strategy: ProjectileStrategy
+        + EnemyProjectile(position: Vector2D, strategy: ProjectileStrategy, image: Image)
+        + update(model: GameEngine)
+        + getRenderableObjectName(): String
+    }
+
+    class EnemyProjectileFactory {
+        + createProjectile(position: Vector2D, strategy: ProjectileStrategy, image: Image): Projectile
+    }
+
+    class PlayerProjectile {
+        - strategy: ProjectileStrategy
+        + PlayerProjectile(position: Vector2D, strategy: ProjectileStrategy)
+        + update(model: GameEngine)
+        + getRenderableObjectName(): String
+    }
+
+    class PlayerProjectileFactory {
+        + createProjectile(position: Vector2D, strategy: ProjectileStrategy, image: Image): Projectile
+    }
+
+    class ProjectileFactory {
+        + createProjectile(position: Vector2D, strategy: ProjectileStrategy, image: Image): Projectile
+    }
+}
+
+FastProjectileStrategy ---|> ProjectileStrategy
+NormalProjectileStrategy ---|> ProjectileStrategy
+SlowProjectileStrategy ---|> ProjectileStrategy
+Projectile ...> EnemyProjectileFactory
+Projectile ...> PlayerProjectileFactory
+
+ProjectileFactory ...> Projectile
+
+Projectile <|-- PlayerProjectile
+Projectile <|-- EnemyProjectile
+
+ProjectileFactory <|--- EnemyProjectileFactory
+ProjectileFactory <|--- PlayerProjectileFactory
+
+ProjectileStrategy <.. EnemyProjectile
+ProjectileStrategy <.. PlayerProjectile
+
+package invaders.state {
+    interface BunkerState {
+        + takeDamage()
+    }
+
+    BunkerState <|-- GreenState
+    BunkerState <|-- YellowState
+    BunkerState <|-- RedState
+    Bunker ...> BunkerState
+
+    class GreenState {
+        + takeDamage()
+    }
+
+    class RedState {
+        + takeDamage()
+    }
+
+    class YellowState {
+        + takeDamage()
+    }
+}
+
+package invaders.factory {
+    class Projectile {
+        - lives: int
+        - position: Vector2D
+        - image: Image
+        + Projectile(position: Vector2D, image: Image)
+        + getPosition(): Vector2D
+        + getImage(): Image
+        + getLayer(): Layer
+        + start()
+        + getWidth(): double
+        + getHeight(): double
+        + takeDamage(amount: double)
+        + getHealth(): double
+        + isAlive(): boolean
+    }
+
+    EnemyProjectile ...> ProjectileStrategy
+    PlayerProjectile ...> ProjectileStrategy
+
+    interface ProjectileFactory {
+        + createProjectile(position: Vector2D, strategy: ProjectileStrategy, image: Image): Projectile
+    }
+
+    class EnemyProjectile {
+        - strategy: ProjectileStrategy
+        + EnemyProjectile(position: Vector2D, strategy: ProjectileStrategy, image: Image)
+        + update(model: GameEngine)
+        + getRenderableObjectName(): String
+    }
+
+    class EnemyProjectileFactory {
+        + createProjectile(position: Vector2D, strategy: ProjectileStrategy, image: Image): Projectile
+    }
+
+    class PlayerProjectile {
+        - strategy: ProjectileStrategy
+        + PlayerProjectile(position: Vector2D, strategy: ProjectileStrategy)
+        + update(model: GameEngine)
+        + getRenderableObjectName(): String
+    }
+
+    class PlayerProjectileFactory {
+        + createProjectile(position: Vector2D, strategy: ProjectileStrategy, image: Image): Projectile
+    }
+}
+
+package invaders.gameobject {
+    interface GameObject {
+        + start()
+        + update(model: GameEngine)
+        + getPosition(): Vector2D
+        + getLayer(): Layer
+        + getImage(): Image
+        + getWidth(): double
+        + getHeight(): double
+        + takeDamage(amount: double)
+        + getHealth(): double
+        + isAlive(): boolean
+        + getRenderableObjectName(): String
+    }
+
+    GameObect <|-- Projectile
+    GameObect <|-- Bunker
+    GameObect <|-- Enemy
+
+    interface Moveable {
+        + up()
+        + down()
+        + left()
+        + right()
+    }
+
+    Moveable <|-- Player
+
+    class Enemy {
+        - position: Vector2D
+        - lives: int
+        - image: Image
+        - xVel: int
+        - enemyProjectile: ArrayList<Projectile>
+        - pendingToDeleteEnemyProjectile: ArrayList<Projectile>
+        - projectileStrategy: ProjectileStrategy
+        - projectileFactory: ProjectileFactory
+        - projectileImage: Image
+        - random: Random
+        + Enemy(position: Vector2D)
+        + start()
+        + update(engine: GameEngine)
+        + getImage(): Image
+        + getWidth(): double
+        + getHeight(): double
+        + getPosition(): Vector2D
+        + getLayer(): Layer
+        + setPosition(position: Vector2D)
+        + setLives(lives: int)
+        + setImage(image: Image)
+        + setProjectileImage(projectileImage: Image)
+        + takeDamage(amount: double)
+        + getHealth(): double
+        + getRenderableObjectName(): String
+        + isAlive(): boolean
+        + setProjectileStrategy(projectileStrategy: ProjectileStrategy)
+    }
+
+    class Player {
+        - position: Vector2D
+        - health: double
+        - velocity: double
+        - width: double
+        - height: double
+        - image: Image
+        - playerProjectileFactory: ProjectileFactory
+        + Player(playerInfo: JSONObject)
+        + takeDamage(amount: double)
+        + getHealth(): double
+        + isAlive(): boolean
+        + up()
+        + down()
+        + left()
+        + right()
+        + shoot(): Projectile
+        + getImage(): Image
+        + getWidth(): double
+        + getHeight(): double
+        + getPosition(): Vector2D
+        + getLayer(): Layer
+        + getRenderableObjectName(): String
+    }
+
+    class Bunker {
+        - position: Vector2D
+        - width: double
+        - height: double
+        - lives: int
+        - image: Image
+        - state: BunkerState
+        + start()
+        + update(model: GameEngine)
+        + setPosition(position: Vector2D)
+        + getPosition(): Vector2D
+        + getLayer(): Layer
+        + getImage(): Image
+        + takeDamage(amount: double)
+        + getHealth(): double
+        + getRenderableObjectName(): String
+        + isAlive(): boolean
+        + getWidth(): double
+        + setWidth(width: int)
+        + getHeight(): double
+        + setHeight(height: int)
+        + getLives(): int
+        + setLives(lives: int)
+        + setImage(image: Image)
+        + getState(): BunkerState
+        + setState(state: BunkerState)
+    }
+}
+
+package invaders.engine {
+    class GameEngine {
+        - gameObjects: List<GameObject>
+        - pendingToAddGameObject: List<GameObject>
+        - pendingToRemoveGameObject: List<GameObject>
+        - pendingToAddRenderable: List<Renderable>
+        - pendingToRemoveRenderable: List<Renderable>
+        - renderables: List<Renderable>
+        - player: Player
+        - left: boolean
+        - right: boolean
+        - gameWidth: int
+        - gameHeight: int
+        - timer: int
+        + GameEngine(config: String)
+        + update()
+        + getRenderables(): List<Renderable>
+        + getGameObjects(): List<GameObject>
+        + getPendingToAddGameObject(): List<GameObject>
+        + getPendingToRemoveGameObject(): List<GameObject>
+        + getPendingToAddRenderable(): List<Renderable>
+        + getPendingToRemoveRenderable(): List<Renderable>
+        + leftReleased()
+        + rightReleased()
+        + leftPressed()
+        + rightPressed()
+        + shootPressed(): boolean
+        + movePlayer()
+        + getGameWidth(): int
+        + getGameHeight(): int
+        + getPlayer(): Player
+    }
+
+    GameEngine ...> Player
+    GameEngine ...> GameObject
+    GameEngine ...> Renderable
+    GameEngine ...> KeyboardInputHandler
+
+    GameWindow ...> GameEngine
+    GameWindow ...> EntityView
+    GameWindow ...> Renderable
+
+    class GameWindow {
+        - width: int
+        - height: int
+        - scene: Scene
+        - pane: Pane
+        - model: GameEngine
+        - entityViews: List<EntityView>
+        - background: Renderable
+        - xViewportOffset: double
+        - yViewportOffset: double
+        + GameWindow(model: GameEngine)
+        + run()
+        + draw()
+        + getScene(): Scene
+    }
+
+    class KeyboardInputHandler {
+        - model: GameEngine
+        - left: boolean
+        - right: boolean
+        - pressedKeys: Set<KeyCode>
+        - sounds: Map<String, MediaPlayer>
+        + KeyboardInputHandler(model: GameEngine)
+        + handlePressed(keyEvent: KeyEvent)
+        + handleReleased(keyEvent: KeyEvent)
+    }
+}
+
+package invaders.memento {
+    interface GameOriginator  <<interface>> {
+        +save(): GameMemento
+        +setPlayer(player: Player)
+        +setLeft(left: Boolean)
+        +setRight(right: Boolean)
+        +setScore(score: int)
+        +setTimer(frames: int)
+        +setGameObjects(renderables: List<Renderable>, gameObjects: List<GameObject>)
+    }
+
+    interface GameCareTaker <<interface>> {
+        +undo()
+        +save()
+    }
+
+    interface GameMemento <<interface>> {
+        +undo()
+    }
+
+    class BasicGameMemento {
+        - gameObjects: List<GameObject>
+        - pendingToAddGameObject: List<GameObject>
+        - pendingToRemoveGameObject: List<GameObject>
+        - pendingToAddRenderable: List<Renderable>
+        - pendingToRemoveRenderable: List<Renderable>
+        - renderables: List<Renderable>
+        - collectables: List<ScoreCollectable>
+        - player: Player
+        - left: boolean
+        - right: boolean
+        - timer: int
+        - gameOriginator: GameOriginator
+        - frames: int
+        - score: int
+
+        + BasicGameMemento(go: GameOriginator)
+        + setLeft(left: boolean): GameMemento
+        + setRight(right: boolean): GameMemento
+        + setPlayer(player: Player): GameMemento
+        + setTimer(timer: Timer): void
+        + setScore(score: Score): void
+        + undo(): void
+        + setGameObjects(renderables: List<Renderable>, gameObjects: List<GameObject>): void
+    }
+}
+
+GameOriginator ...> GameMemento
+GameCareTaker o--> GameMemento
+
+BasicGameMemento ..up-|> GameMemento
+BasicGameMemento <--right-->  GameEngine
+
+GameWindow ..up..|> GameCareTaker
+GameEngine ..up..|> GameOriginator
+
+package invaders.observer {
+    interface CounterObserver {
+        +update()
+    }
+
+    class CounterSubject {
+        -observers: List<CounterObserver>
+        +attach(co: CounterObserver)
+        +detach(co: CounterObserver)
+        +informObservers()
+    }
+
+    class Score {
+        -score: int
+        +getScore()
+        +setScore(score: int)
+        +incrementScore(increment: int)
+    }
+
+    class ScoreObserver {
+        -label: Label
+        -concreteSubject: Score
+        +getLabel()
+        +update()
+    }
+
+    class Timer {
+        -frames: int
+        -seconds: int
+        -minutes: int
+        +getFrames()
+        +getTime()
+        +setFrames(frames: int)
+        +incrementTime()
+    }
+
+    class TimerObserver {
+        -label: Label
+        -concreteSubject: Timer
+        +getLabel()
+        +update()
+    }
+
+}
+
+TimerObserver ...|> CounterObserver
+ScoreObserver ...|> CounterObserver
+
+Timer ---> CounterSubject
+Score ---> CounterSubject
+
+CounterSubject o--> CounterObserver
+
+invaders.engine.GameEngine --> invaders.observer.Score
+invaders.engine.GameEngine --> invaders.observer.Timer
+invaders.engine.GameWindow --* invaders.engine.GameEngine
+invaders.engine.GameWindow --> invaders.observer.ScoreObserver
+invaders.engine.GameWindow --> invaders.observer.TimerObserver
+
+package invaders.singleton {
+    abstract class DifficultyConfigReader <<abstract>> {
+        - level: int
+        - gameWidth: int
+        - gameHeight: int
+        - bunkerInfo: JSONArray
+        - enemiesInfo: JSONArray
+        - playerInfo: JSONObject
+        - config: String
+        - start(): void
+        + getLevel(): int
+        + getGameWidth(): int
+        + getGameHeight(): int
+        + getBunkerInfo(): JSONArray
+        + getEnemiesInfo(): JSONArray
+        + getPlayerInfo(): JSONObject
+    }
+
+    class Level1ConfigReader {
+        - instance: Level1ConfigReader
+        - config: String
+        + getInstance(): Level1ConfigReader
+    }
+
+    class Level2ConfigReader {
+        - instance: Level2ConfigReader
+        - config: String
+        + getInstance(): Level2ConfigReader
+    }
+
+    class Level3ConfigReader {
+        - instance: Level3ConfigReader
+        - config: String
+        + getInstance(): Level3ConfigReader
+    }
+
+    class Level4ConfigReader {
+        - instance: Level4ConfigReader
+        - config: String
+        + getInstance(): Level4ConfigReader
+    }
+}
+
+package invaders.state {
+    class GameStateClass {
+        - width: int
+        - height: int
+        - scene: Scene
+        - pane: Pane
+        + GameStateClass()
+        + getScene(): Scene
+        + getRootPane(): Pane
+        + run(): void
+        {abstract} + stop(): void
+    }
+
+    class WinScreen {
+        + WinScreen(app: App)
+        {abstract} + stop(): void
+    }
+
+    class LoseScreen {
+        + LoseScreen(app: App)
+        {abstract} + stop(): void
+    }
+}
+    class App {
+        - primaryStage: Stage
+        - model: GameEngine
+        - window: GameWindow
+        - currentGameState: GameStateClass
+        - gameStates: ArrayList<GameStateClass>
+        + main(args: String[]): void
+        + App()
+        + setLevel(dcr: DifficultyConfigReader): void
+        + start(primaryStage: Stage): void
+        + setGameState(gs: GameStateClass): void
+        + nextScene(): void
+    }
+DifficultyConfigReader <|-- Level1ConfigReader
+DifficultyConfigReader <|-- Level2ConfigReader
+DifficultyConfigReader <|-- Level3ConfigReader
+DifficultyConfigReader <|-- Level4ConfigReader
+GameStateClass <|-- WinScreen
+GameStateClass <|-- LoseScreen
+GameStateClass <|-- LoseScreen
+GameStateClass <|-- GameWindow
+GameEngine --> DifficultyConfigReader
+App --> GameStateClass
+GameWindow --> GameEngine
+
+package invaders.entities {
+    interface EntityView {
+        + update(xViewportOffset: double, yViewportOffset: double)
+        + matchesEntity(entity: Renderable): boolean
+        + markForDelete()
+        + getNode(): Node
+        + isMarkedForDelete(): boolean
+    }
+
+    class EntityViewImpl {
+        - entity: Renderable
+        - position: Vector2D
+        - delete: boolean
+        - node: ImageView
+        + EntityViewImpl(entity: Renderable)
+        + update(xViewportOffset: double, yViewportOffset: double)
+        + matchesEntity(entity: Renderable): boolean
+        + markForDelete()
+        + getNode(): Node
+        + isMarkedForDelete(): boolean
+    }
+
+    class Player {
+        // ... Player class attributes and methods ...
+    }
+
+    class SpaceBackground {
+        // ... SpaceBackground class attributes and methods ...
+    }
+}
+
+package invaders.rendering {
+    interface Animation {
+        + getName(): String
+        + getCurrentFrame(): Image
+        + next()
+    }
+
+    class Animator {
+        - animations: List<Animation>
+        - state: Animation
+        + Animator(animations: List<Animation>)
+        + setState(name: String)
+        + getState(): Animation
+    }
+
+    interface Renderable {
+        + getImage(): Image
+        + getWidth(): double
+        + getHeight(): double
+        + getPosition(): Vector2D
+        + getLayer(): Layer
+        + isAlive(): boolean
+        + takeDamage(amount: double)
+        + getHealth(): double
+        + isColliding(col: Renderable): boolean
+        + getRenderableObjectName(): String
+
+        enum Layer {
+            BACKGROUND
+            FOREGROUND
+            EFFECT
+        }
+    }
+
+    class AnimationImpl {
+        // ... AnimationImpl class attributes and methods ...
+    }
+
+    class RenderableObject {
+        // ... RenderableObject class attributes and methods ...
+    }
+}
+
+
 
 @enduml

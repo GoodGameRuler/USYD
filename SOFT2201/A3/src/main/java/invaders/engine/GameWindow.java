@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 import invaders.entities.EntityViewImpl;
 import invaders.entities.SpaceBackground;
+import invaders.factory.EnemyProjectile;
+import invaders.gameobject.Enemy;
 import invaders.gameobject.ScoreCollectable;
 import invaders.memento.GameCareTaker;
 import invaders.memento.GameMemento;
@@ -44,6 +46,8 @@ public class GameWindow extends GameStateClass implements GameCareTaker {
     private Timeline timeline;
     // private static final double VIEWPORT_MARGIN = 280.0;
     private GameMemento prevCheckpoint = null;
+    private ScoreObserver so;
+    private TimerObserver to;
 
 	public GameWindow(GameEngine model){
         this.model = model;
@@ -60,8 +64,8 @@ public class GameWindow extends GameStateClass implements GameCareTaker {
         scene.setOnKeyReleased(keyboardInputHandler::handleReleased);
 
 
-        ScoreObserver so = new ScoreObserver(model.getScore());
-        TimerObserver to = new TimerObserver(model.getTimer());
+        so = new ScoreObserver(model.getScore());
+        to = new TimerObserver(model.getTimer());
 
         model.getTimer().attach(to);
         model.getScore().attach(so);
@@ -77,12 +81,21 @@ public class GameWindow extends GameStateClass implements GameCareTaker {
 
         Button save = new Button("Save");
         Button undo = new Button("Undo");
-        Button cheat = new Button("Cheat");
+        Button cheatFA = new Button("Cheat FA");
+        Button cheatSA = new Button("Cheat SA");
+        Button cheatFP = new Button("Cheat FP");
+        Button cheatSP = new Button("Cheat SP");
 
         save.setFocusTraversable(false);
-        cheat.setFocusTraversable(false);
         undo.setFocusTraversable(false);
+        cheatFA.setFocusTraversable(false);
+        cheatSA.setFocusTraversable(false);
+        cheatFP.setFocusTraversable(false);
+        cheatSP.setFocusTraversable(false);
 
+        ArrayList<Renderable> allRendarables = new ArrayList<>();
+        allRendarables.addAll(model.getRenderables());
+        allRendarables.addAll(model.getPendingToAddRenderable());
         EventHandler<ActionEvent> saveEvent = new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
                 save();
@@ -95,10 +108,70 @@ public class GameWindow extends GameStateClass implements GameCareTaker {
             }
         };
 
+        EventHandler<ActionEvent> cheatFAEvent = new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e) {
+                for(Renderable rend : allRendarables) {
+                    if(rend.getRenderableObjectName().equals("Enemy")) {
+                        if(((Enemy) rend).getScore() == 4) {
+                            rend.takeDamage(rend.getHealth());
+                        }
+
+                    }
+                }
+            }
+        };
+
+        EventHandler<ActionEvent> cheatSAEvent = new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e) {
+                for(Renderable rend : allRendarables) {
+                    if(rend.getRenderableObjectName().equals("Enemy")) {
+                        if(((Enemy) rend).getScore() == 3) {
+                            rend.takeDamage(rend.getHealth());
+                        }
+
+                    }
+                }
+            }
+        };
+
+        EventHandler<ActionEvent> cheatFPEvent = new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e) {
+                for(Renderable rend : allRendarables) {
+                    if(rend.getRenderableObjectName().equals("Enemy")) {
+                        Enemy enemy = (Enemy) rend;
+                        if(enemy.getScore() == 4) {
+                            enemy.getEnemyProjectile().forEach(ep -> {
+                                ep.takeDamage(ep.getHealth());
+                            });
+                        }
+                    }
+                }
+            }
+        };
+
+        EventHandler<ActionEvent> cheatSPEvent = new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e) {
+                for(Renderable rend : allRendarables) {
+                    if(rend.getRenderableObjectName().equals("Enemy")) {
+                        Enemy enemy = (Enemy) rend;
+                        if(enemy.getScore() == 3) {
+                            enemy.getEnemyProjectile().forEach(ep -> {
+                                ep.takeDamage(ep.getHealth());
+                            });
+                        }
+                    }
+                }
+            }
+        };
         save.setOnAction(saveEvent);
         undo.setOnAction(undoEvent);
 
-        hb.getChildren().addAll(so.getLabel(), to.getLabel(), save, undo, cheat);
+        cheatFA.setOnAction(cheatFAEvent);
+        cheatSA.setOnAction(cheatSAEvent);
+        cheatSP.setOnAction(cheatSPEvent);
+        cheatFP.setOnAction(cheatFPEvent);
+
+        hb.getChildren().addAll(so.getLabel(), to.getLabel(), save, undo, cheatFA, cheatSA, cheatFP, cheatSP);
         pane.getChildren().add(hb);
 
     }

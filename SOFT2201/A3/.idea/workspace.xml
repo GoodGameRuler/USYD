@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="9d06d531-003f-4820-bde3-425e112d387a" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../../.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../COMP3520/A2/S1/.cache/clangd/index/dispatch.c.A6AC97B3031EAA5A.idx" beforeDir="false" afterPath="$PROJECT_DIR$/../../COMP3520/A2/S1/.cache/clangd/index/dispatch.c.A6AC97B3031EAA5A.idx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../COMP3520/A2/S1/.cache/clangd/index/pcb.h.A57A27DCB69CA332.idx" beforeDir="false" afterPath="$PROJECT_DIR$/../../COMP3520/A2/S1/.cache/clangd/index/pcb.h.A57A27DCB69CA332.idx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../COMP3520/A2/S1/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/../../COMP3520/A2/S1/Makefile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../COMP3520/A2/S1/dispatch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../COMP3520/A2/S1/resources/rand.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../../COMP3520/A2/S1/resources/rand.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/invaders/all.puml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/invaders/all.puml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/invaders/engine/GameEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/invaders/engine/GameEngine.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/invaders/engine/GameWindow.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/invaders/engine/GameWindow.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/invaders/factory/EnemyProjectile.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/invaders/factory/EnemyProjectile.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/invaders/gameobject/Bunker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/invaders/gameobject/Bunker.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/invaders/gameobject/Enemy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/invaders/gameobject/Enemy.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/invaders/memento/BasicGameMemento.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/invaders/memento/BasicGameMemento.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/invaders/memento/Memento.puml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/invaders/memento/Memento.puml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/invaders/observer/observer.puml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/invaders/observer/observer.puml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/invaders/singleton/Singleton-State.puml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/invaders/singleton/Singleton-State.puml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <projects_view>
+          <tree_state>
+            <expand />
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+        <option value="Interface" />
+        <option value="UML Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
+  <component name="ProjectId" id="2WmqsxvCEA1UuBlKsxa8wCJNKNm" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultPlantUmlFileTemplate": "UML Class",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/home/udit/Desktop/USYD/SOFT2201/A3",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
+    <key name="ExtractSuperBase.RECENT_KEYS">
+      <recent name="invaders.state" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="invaders.state" />
+      <recent name="invaders.observer" />
+      <recent name="invaders.singleton" />
+    </key>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="9d06d531-003f-4820-bde3-425e112d387a" name="Changes" comment="" />
+      <created>1697348313377</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1697348313377</updated>
+      <workItem from="1697348314383" duration="5288000" />
+      <workItem from="1697354901327" duration="2408000" />
+      <workItem from="1697425772177" duration="2251000" />
+      <workItem from="1697696408372" duration="3545000" />
+      <workItem from="1698323345487" duration="82916000" />
+      <workItem from="1698558227157" duration="152000" />
+      <workItem from="1698558385085" duration="12963000" />
+      <workItem from="1698651230955" duration="12678000" />
+      <workItem from="1698862557720" duration="326000" />
+      <workItem from="1698863618213" duration="16094000" />
+      <workItem from="1699089801628" duration="13173000" />
+      <workItem from="1699181707136" duration="3205000" />
+      <workItem from="1699274454516" duration="604000" />
+      <workItem from="1699275263361" duration="394000" />
+      <workItem from="1700488823478" duration="3000" />
+      <workItem from="1700799533118" duration="6000" />
+      <workItem from="1702826578474" duration="27000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

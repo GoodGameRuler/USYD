@@ -1,0 +1,34 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-c",
+      "-fsanitize=address",
+      "-g",
+      "-I",
+      "lib",
+      "-o",
+      "dispatch",
+      "src/pcb.c"
+    ],
+    "directory": "/home/udit/Desktop/USYD/COMP3520/A2/S2",
+    "file": "/home/udit/Desktop/USYD/COMP3520/A2/S2/src/pcb.c",
+    "output": "/home/udit/Desktop/USYD/COMP3520/A2/S2/dispatch"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-c",
+      "-fsanitize=address",
+      "-g",
+      "-I",
+      "lib",
+      "-o",
+      "dispatch",
+      "src/dispatch.c"
+    ],
+    "directory": "/home/udit/Desktop/USYD/COMP3520/A2/S2",
+    "file": "/home/udit/Desktop/USYD/COMP3520/A2/S2/src/dispatch.c",
+    "output": "/home/udit/Desktop/USYD/COMP3520/A2/S2/dispatch"
+  }
+]

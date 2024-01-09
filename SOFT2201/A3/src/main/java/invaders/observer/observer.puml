@@ -1,27 +1,92 @@
 @startuml
-'https://plantuml.com/class-diagram
 
-abstract class AbstractList
-abstract AbstractCollection
-interface List
-interface Collection
+skinparam linetype ortho
 
-List <|-- AbstractList
-Collection <|-- AbstractCollection
+package invaders.observer {
+    interface CounterObserver {
+        +update()
+    }
 
-Collection <|- List
-AbstractCollection <|- AbstractList
-AbstractList <|-- ArrayList
+    class CounterSubject {
+        -observers: List<CounterObserver>
+        +attach(co: CounterObserver)
+        +detach(co: CounterObserver)
+        +informObservers()
+    }
 
-class ArrayList {
-Object[] elementData
-size()
+    class Score {
+        -score: int
+        +getScore()
+        +setScore(score: int)
+        +incrementScore(increment: int)
+    }
+
+    class ScoreObserver {
+        -label: Label
+        -concreteSubject: Score
+        +getLabel()
+        +update()
+    }
+
+    class Timer {
+        -frames: int
+        -seconds: int
+        -minutes: int
+        +getFrames()
+        +getTime()
+        +setFrames(frames: int)
+        +incrementTime()
+    }
+
+    class TimerObserver {
+        -label: Label
+        -concreteSubject: Timer
+        +getLabel()
+        +update()
+    }
+
 }
 
-enum TimeUnit {
-DAYS
-HOURS
-MINUTES
+package invaders.engine {
+    class GameEngine {
+        -score: Score
+        -timer: Timer
+        +update()
+    }
+
+    class GameWindow {
+        -model: GameEngine
+        -scene: Scene
+        -pane: Pane
+        -entityViews: List<EntityView>
+        -scoreObserver: ScoreObserver
+        -timerObserver: TimerObserver
+        +run()
+        +stop()
+        +draw()
+        +getScene()
+    }
 }
 
+package invaders.gameobject {
+    interface ScoreCollectable <<interface>> {
+        +setScoreCollector(score: Score)
+        +incrementCollector()
+        +getScore()
+    }
+}
+
+TimerObserver ..up.|> CounterObserver
+ScoreObserver ..up.|> CounterObserver
+
+Timer --up-> CounterSubject
+Score --up-> CounterSubject
+
+CounterSubject o--> CounterObserver
+
+invaders.engine.GameEngine --> invaders.observer.Score
+invaders.engine.GameEngine --> invaders.observer.Timer
+invaders.engine.GameWindow --* invaders.engine.GameEngine
+invaders.engine.GameWindow --> invaders.observer.ScoreObserver
+invaders.engine.GameWindow --> invaders.observer.TimerObserver
 @enduml

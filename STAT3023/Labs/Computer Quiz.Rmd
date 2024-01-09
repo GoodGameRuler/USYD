@@ -1,0 +1,105 @@
+---
+title: "Computer Quiz"
+output: 
+  html_document:
+    self_contained: yes
+    mode: selfcontained
+date: "2023-11-01"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Question 1
+
+```{r q1}
+th = (-400:400) / 100
+n = 5
+nsim = 100
+ml.mse = 0
+dconj.mse = 0 
+d0.mse = 0
+```
+
+## Question 2
+
+```{r q2}
+for(i in 1:length(th)) {
+  ml = 0 
+  dconj = 0
+  for (j in 1:nsim) {
+    # Generate a sample x from a normal distribution
+    x <- rnorm(n, mean = th[i], sd = 1)
+    
+    ml[j] = mean(x)
+    T = (n * ml[j])
+    dconj[j] = T / (n + 1)
+    
+  }
+  
+  ml.mse[i] = mean((ml - th[i])^2)
+  dconj.mse[i] = mean((dconj - th[i])^2)
+}
+
+```
+
+## Question 3 
+
+```{r q3}
+
+# Plot dconj.mse vs. th in blue
+plot(th, dconj.mse, type = "l", col = "blue", xlab = "Theta (θ)", ylab = "Mean Squared Error (MSE)",
+     main = "Mean Squared Error vs. θ for Conjugate (Blue) and MLE (Red)",
+     ylim = c(0, max(max(dconj.mse), max(ml.mse))))
+
+# Add the plot of ml.mse vs. th in red
+lines(th, ml.mse, col = "red")
+
+# Add a legend
+legend("topright", legend = c("Conjugate/Bayes", "MLE"), col = c("blue", "red"), lty = 1)
+```
+
+## Question 4
+
+For theta -2:2 the Bayes estimator had a lower MSE. This does not necessarily mean that the estimator is better, it just suggests in this variation of theta, the MSE was lower, and hence the estimator was more accurate. For  Theta -4:2 and 2:4 MLE performed much better.
+
+## Question 5
+
+```{r q5}
+n <- 20
+nsim <- 1000
+
+# Repeat the loops with a sample size of 20
+for (i in 1:length(th)) {
+  ml = 0
+  dconj = 0
+
+  for (j in 1:nsim) {
+    # Generate a sample x from a normal distribution
+    x = rnorm(n, mean = th[i], sd = 1)
+
+    # Compute dmle(X) and d0(X)
+    ml[j] = mean(x)
+    T = (n * ml[j])
+    dconj[j] = T / (n + 1)
+ 
+  }
+
+  # Compute the average squared error for each estimator
+  ml.mse[i] <- mean((ml - th[i])^2)
+  d0.mse[i] <- mean((dconj - th[i])^2)
+}
+
+```
+
+## Question 6
+```{r q6}
+
+# Plot ml.mse (red line) and d0.mse (black line)
+plot(th, ml.mse, type = "l", col = "red", xlab = "Theta (θ)", ylab = "Mean Squared Error (MSE)",
+     main = "Mean Squared Error vs. θ for dmle (Red) and d0 (Black)")
+lines(th, d0.mse, col = "black")
+legend("topright", legend = c("MLE", "Conjugate/Bayes"), col = c("red", "black"), lty = 1)
+
+```

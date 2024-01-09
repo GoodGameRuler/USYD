@@ -1,27 +1,60 @@
 @startuml
-'https://plantuml.com/class-diagram
+!define ArrowSize 0.8
+skinparam linetype ortho
 
-abstract class AbstractList
-abstract AbstractCollection
-interface List
-interface Collection
+package invaders.memento {
+    interface GameOriginator  <<interface>> {
+        +save(): GameMemento
+        +setPlayer(player: Player)
+        +setLeft(left: Boolean)
+        +setRight(right: Boolean)
+        +setScore(score: int)
+        +setTimer(frames: int)
+        +setGameObjects(renderables: List<Renderable>, gameObjects: List<GameObject>)
+    }
 
-List <|-- AbstractList
-Collection <|-- AbstractCollection
+    interface GameCareTaker <<interface>> {
+        +undo()
+        +save()
+    }
 
-Collection <|- List
-AbstractCollection <|- AbstractList
-AbstractList <|-- ArrayList
+    interface GameMemento <<interface>> {
+        +undo()
+    }
 
-class ArrayList {
-Object[] elementData
-size()
+    class BasicGameMemento {
+        - gameObjects: List<GameObject>
+        - pendingToAddGameObject: List<GameObject>
+        - pendingToRemoveGameObject: List<GameObject>
+        - pendingToAddRenderable: List<Renderable>
+        - pendingToRemoveRenderable: List<Renderable>
+        - renderables: List<Renderable>
+        - collectables: List<ScoreCollectable>
+        - player: Player
+        - left: boolean
+        - right: boolean
+        - timer: int
+        - gameOriginator: GameOriginator
+        - frames: int
+        - score: int
+
+        + BasicGameMemento(go: GameOriginator)
+        + setLeft(left: boolean): GameMemento
+        + setRight(right: boolean): GameMemento
+        + setPlayer(player: Player): GameMemento
+        + setTimer(timer: Timer): void
+        + setScore(score: Score): void
+        + undo(): void
+        + setGameObjects(renderables: List<Renderable>, gameObjects: List<GameObject>): void
+    }
 }
 
-enum TimeUnit {
-DAYS
-HOURS
-MINUTES
-}
+GameOriginator ...> GameMemento
+GameCareTaker o--> GameMemento
 
+BasicGameMemento ..up-|> GameMemento
+BasicGameMemento <--right-->  GameEngine
+
+GameWindow ..up..|> GameCareTaker
+GameEngine ..up..|> GameOriginator
 @enduml
